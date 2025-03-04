@@ -1,0 +1,63 @@
+package com.example.goppho.models;
+
+import jakarta.persistence.*;
+
+import java.time.Instant;
+
+@Entity
+@Table(name = "users")
+public class UserModel {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36)
+    private String userId;
+
+    @Column(length = 50, unique = true, nullable = false)
+    private String userEmail;
+
+    @Column(nullable = false, updatable = false)
+    private Long createdAt;
+
+    @Column(nullable = false)
+    private Long lastUpdatedAt;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getLastUpdatedAt() {
+        return lastUpdatedAt;
+    }
+
+    public void setLastUpdatedAt(long lastUpdatedAt) {
+        this.lastUpdatedAt = lastUpdatedAt;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        long now = Instant.now().toEpochMilli();
+        this.createdAt = now;
+        this.lastUpdatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.lastUpdatedAt = Instant.now().toEpochMilli();
+    }
+}

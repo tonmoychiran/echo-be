@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: goppho
+  datasource:
+    url: jdbc:postgresql://localhost:5432/goppho_database
+    username: goppho_database_admin
+    password: anganamma
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
