@@ -9,3 +9,4 @@
 - **refactor:** For code changes that neither fix bugs nor add features
 - **test:** For adding or modifying tests
 - **chore:** For general maintenance tasks
+- **git:** For git config
