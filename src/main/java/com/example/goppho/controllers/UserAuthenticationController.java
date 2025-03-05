@@ -14,12 +14,12 @@ public class UserAuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<UserLoginRequestDTO> requestLogin(
-            @Valid @RequestBody UserLoginRequestDTO user
+            @Valid @RequestBody UserLoginRequestDTO userLoginRequest
     ) {
-        return new ResponseEntity<UserLoginRequestDTO>(user, HttpStatus.CREATED);
+        return new ResponseEntity<UserLoginRequestDTO>(userLoginRequest, HttpStatus.CREATED);
     }
 
-    @PatchMapping("/login")
+    @PatchMapping("/login/verify")
     public ResponseEntity<UserLoginVerifyRequestDTO> verifyLogin(
             @Valid @RequestBody UserLoginVerifyRequestDTO user
     ) {

@@ -1,13 +1,15 @@
-package com.example.goppho.models;
+package com.example.goppho.entities;
 
 import com.example.goppho.services.SecureOTP;
 import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 
 import java.time.Instant;
 
-public class UserAuthOTPModel {
-    @Column(length = 50, unique = true, nullable = false)
+public class UserAuthOTPEntity {
+    @Id
+    @Column(length = 50, nullable = false)
     private String userEmail;
 
     @Column(length = 6, unique = true, nullable = false)
@@ -22,7 +24,7 @@ public class UserAuthOTPModel {
         this.createdAt = Instant.now().toEpochMilli();
     }
 
-    public UserAuthOTPModel(String userEmail) {
+    public UserAuthOTPEntity(String userEmail) {
         this.userEmail = userEmail;
     }
 

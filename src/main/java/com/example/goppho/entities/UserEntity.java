@@ -1,4 +1,4 @@
-package com.example.goppho.models;
+package com.example.goppho.entities;
 
 import jakarta.persistence.*;
 
@@ -6,7 +6,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "users")
-public class UserModel {
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(length = 36)
