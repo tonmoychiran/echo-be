@@ -26,8 +26,6 @@ public class UserAuthenticationService {
     public void requestLogin(
             UserLoginRequestDTO userLoginRequest
     ) {
-        this.userAuthOTPRepository.save(
-                new UserAuthOTPEntity()
-        );
+
     }
 }
