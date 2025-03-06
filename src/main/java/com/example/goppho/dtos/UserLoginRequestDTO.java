@@ -8,4 +8,8 @@ public class UserLoginRequestDTO {
     @Length(max = 50, message = "Email exceeds 50 characters")
     @Email(message = "Enter a valid email")
     String email;
+
+    public  String getEmail() {
+        return email;
+    }
 }

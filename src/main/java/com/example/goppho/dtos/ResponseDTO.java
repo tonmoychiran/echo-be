@@ -1,9 +1,9 @@
 package com.example.goppho.dtos;
 
-public class ErrorResponseDTO{
+public class ResponseDTO {
     String message;
 
-    public ErrorResponseDTO(String message) {
+    public ResponseDTO(String message) {
         this.message = message;
     }
 

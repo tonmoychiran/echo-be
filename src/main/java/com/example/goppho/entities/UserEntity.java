@@ -21,6 +21,13 @@ public class UserEntity {
     @Column(nullable = false)
     private Long lastUpdatedAt;
 
+    public UserEntity(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public UserEntity() {
+    }
+
     public String getUserId() {
         return userId;
     }

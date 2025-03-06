@@ -2,7 +2,7 @@ package com.example.goppho.configs;
 
 
 import com.example.goppho.dtos.DetailedErrorResponseDTO;
-import com.example.goppho.dtos.ErrorResponseDTO;
+import com.example.goppho.dtos.ResponseDTO;
 import com.example.goppho.dtos.ValidationErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDTO> handleValidationException(
+    public ResponseEntity<ResponseDTO> handleValidationException(
             MethodArgumentNotValidException ex
     ) {
         List<FieldError> fieldErrors = ex.getFieldErrors();
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
         }
 
         return new ResponseEntity<>(
-                new DetailedErrorResponseDTO<ValidationErrorDTO>(
+                new DetailedErrorResponseDTO<>(
                         "Validation Error",
                         validationErrors
                 ),
@@ -45,33 +45,33 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErrorResponseDTO> handleNoResourceFoundException(
+    public ResponseEntity<ResponseDTO> handleNoResourceFoundException(
             Exception ex
     ) {
         return new ResponseEntity<>(
-                new ErrorResponseDTO(ex.getMessage()),
+                new ResponseDTO(ex.getMessage()),
                 HttpStatus.NOT_FOUND
         );
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ErrorResponseDTO> handleHttpRequestMethodNotSupportedExceptionException(
+    public ResponseEntity<ResponseDTO> handleHttpRequestMethodNotSupportedExceptionException(
             Exception ex
     ) {
         return new ResponseEntity<>(
-                new ErrorResponseDTO(ex.getMessage()),
+                new ResponseDTO(ex.getMessage()),
                 HttpStatus.NOT_FOUND
         );
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDTO> handleGeneralException(
+    public ResponseEntity<ResponseDTO> handleGeneralException(
             Exception ex
     ) {
         System.out.println(ex.getClass());
         System.out.println(ex.getMessage());
         return new ResponseEntity<>(
-                new ErrorResponseDTO(ex.getMessage()),
+                new ResponseDTO(ex.getMessage()),
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }

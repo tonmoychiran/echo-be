@@ -2,19 +2,19 @@ package com.example.goppho.dtos;
 
 import java.util.List;
 
-public class DetailedErrorResponseDTO<T> extends ErrorResponseDTO {
-    List<T> details;
+public class DetailedErrorResponseDTO<T> extends ResponseDTO {
+    List<T> errors;
 
-    public DetailedErrorResponseDTO(String message, List<T> details) {
+    public DetailedErrorResponseDTO(String message, List<T> errors) {
         super( message);
-        this.details = details;
+        this.errors = errors;
     }
 
     public List<T> getDetails() {
-        return details;
+        return errors;
     }
 
-    public void setDetails(List<T> details) {
-        this.details = details;
+    public void setDetails(List<T> errors) {
+        this.errors = errors;
     }
 }
