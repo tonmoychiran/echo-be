@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.time.Instant;
 
+@Entity
 public class UserAuthOTPEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,6 +24,9 @@ public class UserAuthOTPEntity {
 
     public UserAuthOTPEntity(UserEntity user) {
         this.user = user;
+    }
+
+    public UserAuthOTPEntity() {
     }
 
     public UserEntity getUser() {

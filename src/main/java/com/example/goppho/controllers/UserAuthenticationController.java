@@ -1,7 +1,5 @@
 package com.example.goppho.controllers;
 
-
-import com.example.goppho.dtos.ResponseDTO;
 import com.example.goppho.dtos.UserLoginRequestDTO;
 import com.example.goppho.dtos.UserLoginRequestSuccessfulResponseDTO;
 import com.example.goppho.dtos.UserLoginVerifyRequestDTO;
