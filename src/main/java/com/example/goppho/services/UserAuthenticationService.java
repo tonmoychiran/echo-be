@@ -54,7 +54,7 @@ public class UserAuthenticationService {
     public UserEntity verifyLogin(
             UserLoginVerifyRequestDTO userLoginVerifyRequest
     ) {
-        String otpId = userLoginVerifyRequest.getId();
+        String otpId = userLoginVerifyRequest.getOtpId();
         String requestedOTP = userLoginVerifyRequest.getOtp();
 
         Optional<UserAuthOTPEntity> otpEntity = this.userAuthOTPRepository.findById(otpId);
@@ -68,10 +68,11 @@ public class UserAuthenticationService {
         if (isOTPExpired(savedOTPAt))
             throw new CredentialsExpiredException("OTP expired");
 
-        if (requestedOTP.equals(savedOTP))
-            return savedOTPEntity.getUser();
+        if (!requestedOTP.equals(savedOTP))
+            throw new BadCredentialsException("OTP not matched");
 
-        throw new BadCredentialsException("Bad credentials");
+        this.userAuthOTPRepository.deleteById(otpId);
+        return savedOTPEntity.getUser();
     }
 
     private Boolean isOTPExpired(Long savedOTPAt) {

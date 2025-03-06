@@ -9,4 +9,12 @@ public class DetailedErrorResponseDTO<T> extends ResponseDTO {
         super( message);
         this.errors = errors;
     }
+
+    public List<T> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<T> errors) {
+        this.errors = errors;
+    }
 }
