@@ -1,11 +1,11 @@
-package com.example.goppho.dtos;
+package com.example.goppho.responses;
 
 import java.util.List;
 
-public class DetailedErrorResponseDTO<T> extends ResponseDTO {
+public class DetailedErrorResponse<T> extends Response {
     List<T> errors;
 
-    public DetailedErrorResponseDTO(String message, List<T> errors) {
+    public DetailedErrorResponse(String message, List<T> errors) {
         super( message);
         this.errors = errors;
     }

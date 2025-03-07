@@ -1,10 +1,10 @@
-package com.example.goppho.dtos;
+package com.example.goppho.responses;
 
-public class ValidationErrorDTO {
+public class ValidationErrorResponse {
     String field;
     String issue;
 
-    public ValidationErrorDTO(String field, String issue) {
+    public ValidationErrorResponse(String field, String issue) {
         this.field = field;
         this.issue = issue;
     }

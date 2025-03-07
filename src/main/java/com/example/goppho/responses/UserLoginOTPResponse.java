@@ -1,9 +1,9 @@
-package com.example.goppho.dtos;
+package com.example.goppho.responses;
 
-public class UserLoginRequestSuccessfulResponseDTO extends ResponseDTO {
+public class UserLoginOTPResponse extends Response {
     private String otpId;
 
-    public UserLoginRequestSuccessfulResponseDTO(String message, String otpId) {
+    public UserLoginOTPResponse(String message, String otpId) {
         super(message);
         this.otpId = otpId;
     }

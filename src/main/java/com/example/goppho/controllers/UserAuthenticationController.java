@@ -1,8 +1,9 @@
 package com.example.goppho.controllers;
 
-import com.example.goppho.dtos.UserLoginRequestDTO;
-import com.example.goppho.dtos.UserLoginRequestSuccessfulResponseDTO;
-import com.example.goppho.dtos.UserLoginVerifyRequestDTO;
+import com.example.goppho.requests.UserLoginOTPRequest;
+import com.example.goppho.requests.UserLoginOTPResendRequest;
+import com.example.goppho.responses.UserLoginOTPResponse;
+import com.example.goppho.requests.UserLoginVerificationRequest;
 import com.example.goppho.entities.UserEntity;
 import com.example.goppho.services.UserAuthenticationService;
 import jakarta.validation.Valid;
@@ -12,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 public class UserAuthenticationController {
 
     private final UserAuthenticationService userAuthenticationService;
@@ -22,21 +23,32 @@ public class UserAuthenticationController {
         this.userAuthenticationService = userAuthenticationService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<UserLoginRequestSuccessfulResponseDTO> requestLogin(
-            @Valid @RequestBody UserLoginRequestDTO userLoginRequest
+    @PostMapping("/login/verification/otp")
+    public ResponseEntity<UserLoginOTPResponse> requestUserLoginVerificationOTP(
+            @Valid @RequestBody UserLoginOTPRequest userLoginRequest
     ) {
-        UserLoginRequestSuccessfulResponseDTO response = this.userAuthenticationService.requestLogin(
+        UserLoginOTPResponse response = this.userAuthenticationService.requestUserLoginVerificationOTP(
                 userLoginRequest
         );
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PatchMapping("/login/verify")
-    public ResponseEntity<UserEntity> verifyLogin(
-            @Valid @RequestBody UserLoginVerifyRequestDTO userLoginVerifyRequest
+
+    @PostMapping("/login/verification/otp/resend")
+    public ResponseEntity<UserLoginOTPResponse> resendUserLoginVerificationOTP(
+            @Valid @RequestBody UserLoginOTPResendRequest userLoginOTPResendRequest
     ) {
-        UserEntity response = this.userAuthenticationService.verifyLogin(
+        UserLoginOTPResponse response = this.userAuthenticationService.resendUserLoginVerificationOTP(
+                userLoginOTPResendRequest
+        );
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login/verification")
+    public ResponseEntity<UserEntity> verifyUserLoginOTP(
+            @Valid @RequestBody UserLoginVerificationRequest userLoginVerifyRequest
+    ) {
+        UserEntity response = this.userAuthenticationService.verifyUserLoginOTP(
                 userLoginVerifyRequest
         );
         return new ResponseEntity<>(response, HttpStatus.CREATED);

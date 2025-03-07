@@ -1,9 +1,9 @@
-package com.example.goppho.dtos;
+package com.example.goppho.requests;
 
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.Length;
 
-public class UserLoginRequestDTO {
+public class UserLoginOTPRequest {
     @NotBlank(message = "Email is empty")
     @Length(max = 50, message = "Email exceeds 50 characters")
     @Email(message = "Enter a valid email")
