@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "userAuthOTP")
+@Table(name = "user_auth_otp")
 public class UserAuthOTPEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

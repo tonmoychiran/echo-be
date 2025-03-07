@@ -39,10 +39,17 @@ public class UserAuthenticationService {
     ) {
         String email = userLoginRequest.getEmail();
 
-        UserEntity userEntity = new UserEntity(email);
-        UserAuthOTPEntity otpEntity = new UserAuthOTPEntity(userEntity);
+        Optional<UserEntity> existingUser = this.userRepository.findByUserEmail(email);
+        UserEntity userEntity;
+        if (existingUser.isEmpty()) {
+            UserEntity newUser = new UserEntity(email);
+            userEntity = this.userRepository.save(newUser);
+        } else {
+            userEntity = existingUser.get();
+        }
 
-        this.userRepository.save(userEntity);
+        this.userAuthOTPRepository.deleteAllByUserIs(userEntity);
+        UserAuthOTPEntity otpEntity = new UserAuthOTPEntity(userEntity);
         UserAuthOTPEntity savedOtp = this.userAuthOTPRepository.save(otpEntity);
 
         return new UserLoginOTPResponse(
@@ -65,6 +72,7 @@ public class UserAuthenticationService {
         UserAuthOTPEntity savedOTPEntity = otpEntity.get();
         String savedOTP = savedOTPEntity.getOtp();
         Long savedOTPAt = savedOTPEntity.getCreatedAt();
+        UserEntity userEntity = savedOTPEntity.getUser();
 
         if (isOTPExpired(savedOTPAt))
             throw new CredentialsExpiredException("OTP expired");
@@ -72,7 +80,7 @@ public class UserAuthenticationService {
         if (!requestedOTP.equals(savedOTP))
             throw new BadCredentialsException("OTP not matched");
 
-        this.userAuthOTPRepository.deleteById(otpId);
+        this.userAuthOTPRepository.deleteAllByUserIs(userEntity);
         return savedOTPEntity.getUser();
     }
 
@@ -88,10 +96,10 @@ public class UserAuthenticationService {
         UserAuthOTPEntity savedOTPEntity = otpEntity.get();
         UserEntity userEntity = savedOTPEntity.getUser();
 
+        this.userAuthOTPRepository.deleteAllByUserIs(userEntity);
+
         UserAuthOTPEntity newOtpEntity = new UserAuthOTPEntity(userEntity);
         UserAuthOTPEntity newSavedOTPEntity = this.userAuthOTPRepository.save(newOtpEntity);
-
-        this.userAuthOTPRepository.deleteById(otpId);
 
         return new UserLoginOTPResponse(
                 "Otp sent",
