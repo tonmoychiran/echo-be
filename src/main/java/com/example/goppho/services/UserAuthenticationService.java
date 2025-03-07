@@ -1,8 +1,9 @@
 package com.example.goppho.services;
 
-import com.example.goppho.dtos.UserLoginRequestDTO;
-import com.example.goppho.dtos.UserLoginRequestSuccessfulResponseDTO;
-import com.example.goppho.dtos.UserLoginVerifyRequestDTO;
+import com.example.goppho.requests.UserLoginOTPRequest;
+import com.example.goppho.requests.UserLoginOTPResendRequest;
+import com.example.goppho.responses.UserLoginOTPResponse;
+import com.example.goppho.requests.UserLoginVerificationRequest;
 import com.example.goppho.entities.UserAuthOTPEntity;
 import com.example.goppho.entities.UserEntity;
 import com.example.goppho.repositories.UserAuthOTPRepository;
@@ -33,8 +34,8 @@ public class UserAuthenticationService {
     }
 
     @Transactional
-    public UserLoginRequestSuccessfulResponseDTO requestLogin(
-            UserLoginRequestDTO userLoginRequest
+    public UserLoginOTPResponse requestUserLoginVerificationOTP(
+            UserLoginOTPRequest userLoginRequest
     ) {
         String email = userLoginRequest.getEmail();
 
@@ -44,15 +45,15 @@ public class UserAuthenticationService {
         this.userRepository.save(userEntity);
         UserAuthOTPEntity savedOtp = this.userAuthOTPRepository.save(otpEntity);
 
-        return new UserLoginRequestSuccessfulResponseDTO(
+        return new UserLoginOTPResponse(
                 "Otp sent",
                 savedOtp.getOtpId()
         );
     }
 
     @Transactional
-    public UserEntity verifyLogin(
-            UserLoginVerifyRequestDTO userLoginVerifyRequest
+    public UserEntity verifyUserLoginOTP(
+            UserLoginVerificationRequest userLoginVerifyRequest
     ) {
         String otpId = userLoginVerifyRequest.getOtpId();
         String requestedOTP = userLoginVerifyRequest.getOtp();
@@ -73,6 +74,30 @@ public class UserAuthenticationService {
 
         this.userAuthOTPRepository.deleteById(otpId);
         return savedOTPEntity.getUser();
+    }
+
+    @Transactional
+    public UserLoginOTPResponse resendUserLoginVerificationOTP(
+            UserLoginOTPResendRequest userLoginOTPResendRequest
+    ) {
+        String otpId = userLoginOTPResendRequest.getOtpId();
+
+        Optional<UserAuthOTPEntity> otpEntity = this.userAuthOTPRepository.findById(otpId);
+        if (otpEntity.isEmpty())
+            throw new EntityNotFoundException("Request not found");
+        UserAuthOTPEntity savedOTPEntity = otpEntity.get();
+        UserEntity userEntity = savedOTPEntity.getUser();
+
+        UserAuthOTPEntity newOtpEntity = new UserAuthOTPEntity(userEntity);
+        UserAuthOTPEntity newSavedOTPEntity = this.userAuthOTPRepository.save(newOtpEntity);
+
+        this.userAuthOTPRepository.deleteById(otpId);
+
+        return new UserLoginOTPResponse(
+                "Otp sent",
+                newSavedOTPEntity.getOtpId()
+        );
+
     }
 
     private Boolean isOTPExpired(Long savedOTPAt) {
