@@ -23,14 +23,17 @@ import java.util.Optional;
 public class UserAuthenticationService {
     UserAuthOTPRepository userAuthOTPRepository;
     UserRepository userRepository;
+    JWTService jwtService;
 
     @Autowired
     public UserAuthenticationService(
             UserAuthOTPRepository userAuthOTPRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            JWTService jwtService
     ) {
         this.userAuthOTPRepository = userAuthOTPRepository;
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
     }
 
     @Transactional
