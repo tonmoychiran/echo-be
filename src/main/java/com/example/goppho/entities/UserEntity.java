@@ -3,6 +3,7 @@ package com.example.goppho.entities;
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -20,6 +21,9 @@ public class UserEntity {
 
     @Column(nullable = false)
     private Long lastUpdatedAt;
+
+    @OneToMany(mappedBy = "user")
+    private List<ParticipantEntity> participants;
 
     public UserEntity(String userEmail) {
         this.userEmail = userEmail;
