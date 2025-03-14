@@ -11,10 +11,3 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
-
-jwt:
-  secret: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiZ29wcGhvYnltYW5kaWZvcm1hbmRpcyJ9.WZ8gEp2NnCOqnYqHObvlevWpxnbVZgzxKzeHA9sVHq3lrGvSwbnHQuSzgfp2E0iOqgce8vKZSDlWPzHWcMfRIR2HiwEy2Qs8bk2hFXoLdNYaZnkAHutF5GQQYmMYIN__x3YbYodtHmpai7pXryvOzeoRl7FaLZxP2EgqLPQ6vy8gtquMfOXYeRbRIgGYZX13thI8YDY_Dupl9nW8RkhOPFvwSQXhK7HNUeUwFbjuRXymM4Rn8iuNt6Vmbr5iCXQ9cqiZeVYKz-dY1GPgq10Yq_Pa3lHoFQ0Kya2lpPTZ5T4kswkHoNP8oiqT47OgRUFsKDVlAveM6jQnzY1CGnmdRQ
-  access:
-    expiration: 3600000
-  refresh:
-    expiration: 604800000

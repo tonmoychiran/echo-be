@@ -17,28 +17,14 @@ import javax.crypto.SecretKey;
 @Configuration
 public class SecurityConfiguration {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/v1/auth/login/**").permitAll()
                         .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt
-                                .decoder(jwtDecoder())
-                        )
                 );
 
         return http.build();
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-        return NimbusJwtDecoder.withSecretKey(secretKey).build();
     }
 }
