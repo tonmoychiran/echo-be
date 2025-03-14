@@ -19,7 +19,7 @@ public class UserAuthOTPEntity {
     @Column(nullable = false)
     private Long createdAt;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
