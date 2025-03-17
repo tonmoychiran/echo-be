@@ -24,14 +24,12 @@ public class ParticipantEntity {
     @Column
     private Long joinedAt;
 
-    public ParticipantEntity(ConversationEntity conversation, UserEntity user, Long joinedAt) {
+    public ParticipantEntity(ConversationEntity conversation, UserEntity user) {
         this.conversation = conversation;
         this.user = user;
-        this.joinedAt = joinedAt;
     }
 
     public ParticipantEntity() {
-
     }
 
     public String getParticipantId() {

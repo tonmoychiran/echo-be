@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "conversation")
@@ -16,6 +17,9 @@ public class ConversationEntity {
     private String conversationName;
 
     @Column
+    private Boolean isGroup;
+
+    @Column
     private Long createdAt;
 
     @OneToMany(mappedBy = "conversation")
@@ -23,6 +27,7 @@ public class ConversationEntity {
 
     public ConversationEntity(String conversationName) {
         this.conversationName = conversationName;
+        this.isGroup = true;
     }
 
     public ConversationEntity() {
@@ -44,6 +49,14 @@ public class ConversationEntity {
         this.conversationName = conversationName;
     }
 
+    public Boolean getGroup() {
+        return isGroup;
+    }
+
+    public void setGroup(Boolean group) {
+        isGroup = group;
+    }
+
     public Long getCreatedAt() {
         return createdAt;
     }
@@ -52,9 +65,16 @@ public class ConversationEntity {
         this.createdAt = createdAt;
     }
 
+    public List<ParticipantEntity> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<ParticipantEntity> participants) {
+        this.participants = participants;
+    }
+
     @PrePersist
     protected void onCreate() {
-        long now = Instant.now().toEpochMilli();
-        this.createdAt = now;
+        this.createdAt = Instant.now().toEpochMilli();
     }
 }
