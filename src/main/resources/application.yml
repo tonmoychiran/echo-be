@@ -1,3 +1,5 @@
+jwt:
+  secret: UIAM_$#*%19Q%J3d"c-4;tk7}tWo7iEV:o^B1av?!|C&^V,-tfp+!nOCm-<]1A(JzQIaDD"c-4;tk7}tWo7iEV:o^B1av?!|C&^V,-_DFL*YSBGB)BpnoQ3`!ZxRK1s
 spring:
   application:
     name: goppho
