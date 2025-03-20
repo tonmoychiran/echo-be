@@ -1,5 +1,6 @@
 jwt:
-  secret: UIAM_$#*%19Q%J3d"c-4;tk7}tWo7iEV:o^B1av?!|C&^V,-tfp+!nOCm-<]1A(JzQIaDD"c-4;tk7}tWo7iEV:o^B1av?!|C&^V,-_DFL*YSBGB)BpnoQ3`!ZxRK1s
+  secret: wVf82Q4g9jU1aK7xL0wVf82Q4wVf82Q4g9jU1aK7xL0oZ3bYc6eRtIuP/mHnJ+sWvA1k=g9jU1aK7xL0oZ3bYc6eRtIuP/mHnJ+sWvA1k=oZ3bYc6eRtIuP/mHnJ+sWvA1k=
+  exp: 3600000
 spring:
   application:
     name: goppho

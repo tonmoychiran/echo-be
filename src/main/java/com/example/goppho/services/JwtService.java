@@ -20,13 +20,16 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${jwt.exp}")
+    private long exp;
+
     private final long iat;
 
     public JwtService() {
         this.iat = Instant.now().toEpochMilli();
     }
 
-    public String generateToken(String subject, long exp) {
+    public String generateToken(String subject) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, subject, exp);
     }
