@@ -2,6 +2,7 @@ package com.example.goppho.configs;
 
 
 import com.example.goppho.entities.UserEntity;
+import com.example.goppho.services.GopphoUserDetailService;
 import com.example.goppho.services.JwtService;
 import com.example.goppho.services.UserService;
 import jakarta.servlet.FilterChain;
@@ -42,25 +43,25 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-//        String authHeader = request.getHeader("Authorization");
-//        String token = null;
-//        String subject = null;
-//
-//        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-//            token = authHeader.substring(7);
-//            subject = jwtService.extractSubject(token);
-//        }
-//
-//        if (subject != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-//            Optional<UserEntity> user = context.getBean(UserService.class).getUserById(subject);
-//            if (jwtService.validateToken(token, user.isPresent().get().getUserId())) {
-//                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//                authToken.setDetails(new WebAuthenticationDetailsSource()
-//                        .buildDetails(request));
-//                SecurityContextHolder.getContext().setAuthentication(authToken);
-//            }
-//        }
-//
-//        filterChain.doFilter(request, response);
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
+        String subject = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+            subject = jwtService.extractSubject(token);
+        }
+
+        if (subject != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = context.getBean(GopphoUserDetailService.class).loadUserByUsername(subject);
+            if (jwtService.validateToken(token, userDetails.getUsername())) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource()
+                        .buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        filterChain.doFilter(request, response);
     }
 }
