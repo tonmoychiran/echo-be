@@ -3,6 +3,7 @@ package com.example.goppho.services;
 import com.example.goppho.entities.UserEntity;
 import com.example.goppho.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +26,10 @@ public class UserService {
         return this.userRepository.findAllById(userIds);
     }
 
-    public Optional<UserEntity> getUserById(String userId) {
-        return this.userRepository.findById(userId);
+
+    public UserEntity getUserByEmail(String email) {
+        Optional<UserEntity> user=this.userRepository.findByUserEmail(email);
+        return user.orElse(null);
     }
 
 }

@@ -5,9 +5,7 @@ import com.example.goppho.requests.UserLoginOTPRequest;
 import com.example.goppho.requests.UserLoginOTPResendRequest;
 import com.example.goppho.responses.UserLoginOTPResponse;
 import com.example.goppho.requests.UserLoginVerificationRequest;
-import com.example.goppho.entities.UserEntity;
 import com.example.goppho.responses.VerifiedUserLoginResponse;
-import com.example.goppho.services.JwtService;
 import com.example.goppho.services.UserAuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +19,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserAuthenticationController {
 
     private final UserAuthenticationService userAuthenticationService;
-    private final JwtService jwtService;
 
     @Autowired
-    public UserAuthenticationController(UserAuthenticationService userAuthenticationService, JwtService jwtService) {
+    public UserAuthenticationController(UserAuthenticationService userAuthenticationService) {
         this.userAuthenticationService = userAuthenticationService;
-        this.jwtService = jwtService;
     }
 
     @PostMapping("/login/verification/otp")
@@ -63,12 +59,12 @@ public class UserAuthenticationController {
     @GetMapping("/profile")
     public ResponseEntity<UserPrincipalEntity> getUserProfile(@AuthenticationPrincipal UserPrincipalEntity userPrincipal) {
 
-//        if (userPrincipal == null) {
-//            return ResponseEntity.badRequest().body("User not authenticated.");
-//        }
-//
-//        String userId = userPrincipal.getUsername(); // Get the user ID
-//        //Or any other information from the userPrincipal.
+/*        if (userPrincipal == null) {
+            return ResponseEntity.badRequest().body("User not authenticated.");
+        }
+
+        String userId = userPrincipal.getUsername(); // Get the user ID
+        //Or any other information from the userPrincipal.*/
         return ResponseEntity.ok(userPrincipal);
 //        {"enabled":true,"accountNonLocked":true,"username":"46f1c84d-674c-4232-af34-ec80132cdf75","authorities":[],"credentialsNonExpired":true,"accountNonExpired":true,"password":""}
     }
