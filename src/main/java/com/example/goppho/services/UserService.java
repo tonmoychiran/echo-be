@@ -28,7 +28,12 @@ public class UserService {
 
 
     public UserEntity getUserByEmail(String email) {
-        Optional<UserEntity> user=this.userRepository.findByUserEmail(email);
+        Optional<UserEntity> user = this.userRepository.findByUserEmail(email);
+        if (user.isPresent()) {
+            System.out.println(user.get());
+        } else {
+            System.out.println("User not found");
+        }
         return user.orElse(null);
     }
 
