@@ -44,7 +44,7 @@ public class JwtService {
                 .add(claims)
                 .subject(subject)
                 .issuedAt(new Date(iat))
-                .expiration(new Date(iat + exp))
+                .expiration(new Date(getValidation()))
                 .and()
                 .signWith(getKey())
                 .compact();
@@ -100,4 +100,7 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    public long getValidation() {
+        return iat + exp;
+    }
 }

@@ -6,6 +6,7 @@ import com.example.goppho.requests.UserLoginOTPResendRequest;
 import com.example.goppho.responses.UserLoginOTPResponse;
 import com.example.goppho.requests.UserLoginVerificationRequest;
 import com.example.goppho.entities.UserEntity;
+import com.example.goppho.responses.VerifiedUserLoginResponse;
 import com.example.goppho.services.JwtService;
 import com.example.goppho.services.UserAuthenticationService;
 import jakarta.validation.Valid;
@@ -50,14 +51,13 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("/login/verification")
-    public ResponseEntity<String> verifyUserLoginOTP(
+    public ResponseEntity<VerifiedUserLoginResponse> verifyUserLoginOTP(
             @Valid @RequestBody UserLoginVerificationRequest userLoginVerifyRequest
     ) {
-        UserEntity response = this.userAuthenticationService.verifyUserLoginOTP(
+        VerifiedUserLoginResponse response = this.userAuthenticationService.verifyUserLoginOTP(
                 userLoginVerifyRequest
         );
-//        return new ResponseEntity<>(response, HttpStatus.CREATED);
-        return new ResponseEntity<>(jwtService.generateToken(response.getUserId()), HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/profile")

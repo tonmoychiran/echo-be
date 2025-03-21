@@ -8,6 +8,7 @@ import com.example.goppho.entities.UserAuthOTPEntity;
 import com.example.goppho.entities.UserEntity;
 import com.example.goppho.repositories.UserAuthOTPRepository;
 import com.example.goppho.repositories.UserRepository;
+import com.example.goppho.responses.VerifiedUserLoginResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,18 @@ import java.util.Optional;
 
 @Service
 public class UserAuthenticationService {
+    private final JwtService jwtService;
     UserAuthOTPRepository userAuthOTPRepository;
     UserRepository userRepository;
 
     @Autowired
     public UserAuthenticationService(
             UserAuthOTPRepository userAuthOTPRepository,
-            UserRepository userRepository
-    ) {
+            UserRepository userRepository,
+            JwtService jwtService) {
         this.userAuthOTPRepository = userAuthOTPRepository;
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
     }
 
     @Transactional
@@ -59,7 +62,7 @@ public class UserAuthenticationService {
     }
 
     @Transactional
-    public UserEntity verifyUserLoginOTP(
+    public VerifiedUserLoginResponse verifyUserLoginOTP(
             UserLoginVerificationRequest userLoginVerifyRequest
     ) {
         String otpId = userLoginVerifyRequest.getOtpId();
@@ -81,7 +84,14 @@ public class UserAuthenticationService {
             throw new BadCredentialsException("OTP not matched");
 
         this.userAuthOTPRepository.deleteAllByUserIs(userEntity);
-        return savedOTPEntity.getUser();
+        String accessToken=this.jwtService.generateToken(savedOTPEntity.getUser().getUserId());
+        long expiresIn=this.jwtService.getValidation();
+
+        return new VerifiedUserLoginResponse(
+                "Login successful",
+                accessToken,
+                expiresIn
+        );
     }
 
     @Transactional
