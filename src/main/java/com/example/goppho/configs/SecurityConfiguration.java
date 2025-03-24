@@ -16,10 +16,7 @@ public class SecurityConfiguration {
         http
                 .csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/api/v1/auth/login/verification/otp").permitAll()
-                        .requestMatchers("/api/v1/auth/login/verification/otp/resend").permitAll()
-                        .requestMatchers("/api/v1/auth/login/verification").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 ).addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
