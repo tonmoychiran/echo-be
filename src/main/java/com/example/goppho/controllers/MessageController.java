@@ -1,11 +1,14 @@
 package com.example.goppho.controllers;
 
 import com.example.goppho.entities.MessageEntity;
+import com.example.goppho.entities.UserPrincipalEntity;
+import com.example.goppho.requests.MessageRequest;
 import com.example.goppho.services.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -23,11 +26,14 @@ public class MessageController {
     @MessageMapping("/message/{roomId}")
     @SendTo("/topic/{roomId}")
     public MessageEntity greeting(
-            @DestinationVariable String roomId,
-            MessageEntity message
+            MessageRequest messageRequest,
+            @AuthenticationPrincipal UserPrincipalEntity userPrincipal,
+            @DestinationVariable String conversationId
     ) {
         return messageService.createNewMessage(
-                message
+                messageRequest,
+                conversationId,
+                userPrincipal.getUsername()
         );
     }
 

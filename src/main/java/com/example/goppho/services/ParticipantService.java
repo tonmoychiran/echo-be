@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,4 +36,11 @@ public class ParticipantService {
         return this.participantRepository.saveAll(participantEntities);
     }
 
+    @Transactional
+    protected Optional<ParticipantEntity> getParticipantByUserAndConversation(
+            UserEntity user,
+            ConversationEntity conversation
+    ) {
+        return this.participantRepository.findByUserAndConversation(user, conversation);
+    }
 }

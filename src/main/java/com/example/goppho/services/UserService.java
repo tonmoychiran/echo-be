@@ -26,6 +26,10 @@ public class UserService {
         return this.userRepository.findAllById(userIds);
     }
 
+    @Transactional
+    protected Optional<UserEntity> getUserById(String userId) {
+        return this.userRepository.findById(userId);
+    }
 
     public UserEntity getUserByEmail(String email) {
         Optional<UserEntity> user = this.userRepository.findByUserEmail(email);

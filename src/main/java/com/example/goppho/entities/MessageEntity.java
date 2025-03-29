@@ -29,9 +29,17 @@ public class MessageEntity {
     @JoinColumn(name="conversation_id")
     private ConversationEntity conversation;
 
-
-    public MessageEntity(String message) {
+    public MessageEntity(String message, UserEntity user, ConversationEntity conversation) {
         this.message = message;
+        this.user = user;
+        this.conversation = conversation;
+    }
+
+    public MessageEntity(String message, List<MessageMediaEntity> media, UserEntity user, ConversationEntity conversation) {
+        this.message = message;
+        this.media = media;
+        this.user = user;
+        this.conversation = conversation;
     }
 
     public String getMessageId() {
@@ -56,6 +64,30 @@ public class MessageEntity {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<MessageMediaEntity> getMedia() {
+        return media;
+    }
+
+    public void setMedia(List<MessageMediaEntity> media) {
+        this.media = media;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    public ConversationEntity getConversation() {
+        return conversation;
+    }
+
+    public void setConversation(ConversationEntity conversation) {
+        this.conversation = conversation;
     }
 
     @PrePersist

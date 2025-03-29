@@ -71,5 +71,8 @@ public class ConversationService {
         return newConversationEntity;
     }
 
-
+    @Transactional
+    protected Optional<ConversationEntity> getConversationById(String conversationId) {
+        return this.conversationRepository.findById(conversationId);
+    }
 }
