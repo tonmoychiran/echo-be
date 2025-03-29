@@ -21,6 +21,14 @@ public class MessageEntity {
     @OneToMany(mappedBy = "message")
     private List<MessageMediaEntity> media;
 
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private UserEntity user;
+
+    @ManyToOne
+    @JoinColumn(name="conversation_id")
+    private ConversationEntity conversation;
+
 
     public MessageEntity(String message) {
         this.message = message;
