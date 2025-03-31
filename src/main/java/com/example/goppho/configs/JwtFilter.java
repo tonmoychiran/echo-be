@@ -20,11 +20,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-
+    private static final Set<String> ALLOWED_PATHS = Set.of(
+            "/api/v1/auth/login/verification",
+            "/api/v1/auth/login/verification/otp",
+            "/api/v1/auth/login/verification/otp/resend"
+    );
     private JwtService jwtService;
     ApplicationContext context;
 
@@ -32,9 +37,9 @@ public class JwtFilter extends OncePerRequestFilter {
     public JwtFilter(
             JwtService jwtService,
             ApplicationContext context
-    ){
-        this.jwtService=jwtService;
-        this.context=context;
+    ) {
+        this.jwtService = jwtService;
+        this.context = context;
     }
 
     @Override
@@ -43,6 +48,13 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+        if (ALLOWED_PATHS.contains(request.getServletPath())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        System.out.println(request.getHeaderNames());
+
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String subject = null;
