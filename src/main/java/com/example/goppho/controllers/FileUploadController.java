@@ -25,9 +25,12 @@ public class FileUploadController {
 
     @PostMapping("/upload-file")
     public Boolean uploadFile(
-            @RequestParam("files") MultipartFile files
+            @RequestParam("files") MultipartFile[] files
     ) throws IOException {
-        System.out.println(files);
+        for(MultipartFile file : files) {
+            fileStorageService.saveFile(file);
+        }
+
         return true;
     }
 }
