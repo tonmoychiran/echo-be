@@ -9,8 +9,20 @@ spring:
     username: goppho_database_admin
     password: anganamma
     driver-class-name: org.postgresql.Driver
-
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: noreplytgc23@gmail.com
+    password: oyhppqbiqihnkpxc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          starttls:
+            enable: false
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true

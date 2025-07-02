@@ -2,6 +2,7 @@ package com.example.goppho.services;
 
 import com.example.goppho.requests.UserLoginOTPRequest;
 import com.example.goppho.requests.UserLoginOTPResendRequest;
+import com.example.goppho.responses.Response;
 import com.example.goppho.responses.UserLoginOTPResponse;
 import com.example.goppho.requests.UserLoginVerificationRequest;
 import com.example.goppho.entities.UserAuthOTPEntity;
@@ -21,23 +22,27 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Service
-public class UserAuthenticationService {
+public class UserAuthService {
     private final JwtService jwtService;
     UserAuthOTPRepository userAuthOTPRepository;
     UserRepository userRepository;
+    EmailSenderService emailSenderService;
 
     @Autowired
-    public UserAuthenticationService(
+    public UserAuthService(
             UserAuthOTPRepository userAuthOTPRepository,
             UserRepository userRepository,
-            JwtService jwtService) {
+            JwtService jwtService,
+            EmailSenderService emailSenderService
+    ) {
         this.userAuthOTPRepository = userAuthOTPRepository;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.emailSenderService = emailSenderService;
     }
 
     @Transactional
-    public UserLoginOTPResponse requestUserLoginVerificationOTP(
+    public Response generateUserLoginOTP(
             UserLoginOTPRequest userLoginRequest
     ) {
         String email = userLoginRequest.getEmail();
@@ -51,13 +56,15 @@ public class UserAuthenticationService {
             userEntity = existingUser.get();
         }
 
-        this.userAuthOTPRepository.deleteAllByUserIs(userEntity);
         UserAuthOTPEntity otpEntity = new UserAuthOTPEntity(userEntity);
         UserAuthOTPEntity savedOtp = this.userAuthOTPRepository.save(otpEntity);
+        String otp = savedOtp.getOtp();
 
-        return new UserLoginOTPResponse(
-                "Otp sent",
-                savedOtp.getOtpId()
+        String subject = "Your Login OTP is " + otp;
+        emailSenderService.sendEmail(email, subject, subject);
+
+        return new Response(
+                "Otp sent"
         );
     }
 
@@ -65,17 +72,23 @@ public class UserAuthenticationService {
     public VerifiedUserLoginResponse verifyUserLoginOTP(
             UserLoginVerificationRequest userLoginVerifyRequest
     ) {
-        String otpId = userLoginVerifyRequest.getOtpId();
+        String email = userLoginVerifyRequest.getEmail();
         String requestedOTP = userLoginVerifyRequest.getOtp();
 
-        Optional<UserAuthOTPEntity> otpEntity = this.userAuthOTPRepository.findById(otpId);
+        Optional<UserEntity> existingUser = this.userRepository.findByUserEmail(email);
+        if (existingUser.isEmpty())
+            throw new EntityNotFoundException("Invalid request");
+        UserEntity userEntity = existingUser.get();
+        String userId = userEntity.getUserId();
+
+        Optional<UserAuthOTPEntity> otpEntity =
+                this.userAuthOTPRepository.findFirstByUserOrderByCreatedAtDesc(userEntity);
         if (otpEntity.isEmpty())
-            throw new EntityNotFoundException("Request not found");
+            throw new EntityNotFoundException("Invalid request");
 
         UserAuthOTPEntity savedOTPEntity = otpEntity.get();
         String savedOTP = savedOTPEntity.getOtp();
         Long savedOTPAt = savedOTPEntity.getCreatedAt();
-        UserEntity userEntity = savedOTPEntity.getUser();
 
         if (isOTPExpired(savedOTPAt))
             throw new CredentialsExpiredException("OTP expired");
@@ -83,39 +96,14 @@ public class UserAuthenticationService {
         if (!requestedOTP.equals(savedOTP))
             throw new BadCredentialsException("OTP not matched");
 
-        this.userAuthOTPRepository.deleteAllByUserIs(userEntity);
-        String accessToken=this.jwtService.generateToken(savedOTPEntity.getUser().getUserId());
-        long expiresIn=this.jwtService.getValidation();
+        String accessToken = this.jwtService.generateToken(userId);
+        long expiresIn = this.jwtService.getValidation();
 
         return new VerifiedUserLoginResponse(
                 "Login successful",
                 accessToken,
                 expiresIn
         );
-    }
-
-    @Transactional
-    public UserLoginOTPResponse resendUserLoginVerificationOTP(
-            UserLoginOTPResendRequest userLoginOTPResendRequest
-    ) {
-        String otpId = userLoginOTPResendRequest.getOtpId();
-
-        Optional<UserAuthOTPEntity> otpEntity = this.userAuthOTPRepository.findById(otpId);
-        if (otpEntity.isEmpty())
-            throw new EntityNotFoundException("Request not found");
-        UserAuthOTPEntity savedOTPEntity = otpEntity.get();
-        UserEntity userEntity = savedOTPEntity.getUser();
-
-        this.userAuthOTPRepository.deleteAllByUserIs(userEntity);
-
-        UserAuthOTPEntity newOtpEntity = new UserAuthOTPEntity(userEntity);
-        UserAuthOTPEntity newSavedOTPEntity = this.userAuthOTPRepository.save(newOtpEntity);
-
-        return new UserLoginOTPResponse(
-                "Otp sent",
-                newSavedOTPEntity.getOtpId()
-        );
-
     }
 
     private Boolean isOTPExpired(Long savedOTPAt) {

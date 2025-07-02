@@ -6,20 +6,18 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
+@IdClass(UserAuthOTPID.class)
 @Table(name = "user_auth_otp")
 public class UserAuthOTPEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(length = 36)
-    private String otpId;
-
     @Column(length = 6, unique = true, nullable = false)
     private String otp;
 
+    @Id
     @Column(nullable = false)
     private Long createdAt;
 
-    @OneToOne
+    @Id
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
@@ -32,10 +30,6 @@ public class UserAuthOTPEntity {
 
     public UserEntity getUser() {
         return user;
-    }
-
-    public String getOtpId() {
-        return otpId;
     }
 
     public String getOtp() {
