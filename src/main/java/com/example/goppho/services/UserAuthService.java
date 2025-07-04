@@ -82,7 +82,7 @@ public class UserAuthService {
         String userId = userEntity.getUserId();
 
         Optional<UserAuthOTPEntity> otpEntity =
-                this.userAuthOTPRepository.findFirstByUserOrderByCreatedAtDesc(userEntity);
+                this.userAuthOTPRepository.findFirstByUserOrderByCreatedAtDesc(userId);
         if (otpEntity.isEmpty())
             throw new EntityNotFoundException("Invalid request");
 
