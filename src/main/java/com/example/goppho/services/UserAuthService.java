@@ -1,9 +1,7 @@
 package com.example.goppho.services;
 
 import com.example.goppho.requests.UserLoginOTPRequest;
-import com.example.goppho.requests.UserLoginOTPResendRequest;
 import com.example.goppho.responses.Response;
-import com.example.goppho.responses.UserLoginOTPResponse;
 import com.example.goppho.requests.UserLoginVerificationRequest;
 import com.example.goppho.entities.UserAuthOTPEntity;
 import com.example.goppho.entities.UserEntity;
@@ -81,7 +79,7 @@ public class UserAuthService {
         if (existingUser.isEmpty())
             throw new EntityNotFoundException("User not found");
 
-        Authentication authentication = authenticationManager.authenticate(
+        authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, requestedOTP)
         );
 

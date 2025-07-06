@@ -81,7 +81,7 @@ public class UserAuthOTPEntity implements UserDetails {
         long now = Instant.now().toEpochMilli();
         long fiveMinutesInMillis = Duration.ofMinutes(5).toMillis();
 
-        return (now - this.createdAt) < fiveMinutesInMillis;
+        return (now - getCreatedAt()) < fiveMinutesInMillis;
     }
 
     @Override
