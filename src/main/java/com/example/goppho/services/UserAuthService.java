@@ -13,16 +13,16 @@ import com.example.goppho.responses.VerifiedUserLoginResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Optional;
 
 @Service
 public class UserAuthService {
+    private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     UserAuthOTPRepository userAuthOTPRepository;
     UserRepository userRepository;
@@ -30,11 +30,13 @@ public class UserAuthService {
 
     @Autowired
     public UserAuthService(
+            AuthenticationManager authenticationManager,
             UserAuthOTPRepository userAuthOTPRepository,
             UserRepository userRepository,
             JwtService jwtService,
             EmailSenderService emailSenderService
     ) {
+        this.authenticationManager = authenticationManager;
         this.userAuthOTPRepository = userAuthOTPRepository;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
@@ -77,26 +79,13 @@ public class UserAuthService {
 
         Optional<UserEntity> existingUser = this.userRepository.findByUserEmail(email);
         if (existingUser.isEmpty())
-            throw new EntityNotFoundException("Invalid request");
-        UserEntity userEntity = existingUser.get();
-        String userId = userEntity.getUserId();
+            throw new EntityNotFoundException("User not found");
 
-        Optional<UserAuthOTPEntity> otpEntity =
-                this.userAuthOTPRepository.findFirstByUserOrderByCreatedAtDesc(userId);
-        if (otpEntity.isEmpty())
-            throw new EntityNotFoundException("Invalid request");
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, requestedOTP)
+        );
 
-        UserAuthOTPEntity savedOTPEntity = otpEntity.get();
-        String savedOTP = savedOTPEntity.getOtp();
-        Long savedOTPAt = savedOTPEntity.getCreatedAt();
-
-        if (isOTPExpired(savedOTPAt))
-            throw new CredentialsExpiredException("OTP expired");
-
-        if (!requestedOTP.equals(savedOTP))
-            throw new BadCredentialsException("OTP not matched");
-
-        String accessToken = this.jwtService.generateToken(userId);
+        String accessToken = this.jwtService.generateToken(email);
         long expiresIn = this.jwtService.getValidation();
 
         return new VerifiedUserLoginResponse(
@@ -104,15 +93,5 @@ public class UserAuthService {
                 accessToken,
                 expiresIn
         );
-    }
-
-    private Boolean isOTPExpired(Long savedOTPAt) {
-        if (savedOTPAt == null)
-            return true;
-
-        long now = Instant.now().toEpochMilli();
-        long fiveMinutesInMillis = Duration.ofMinutes(5).toMillis();
-
-        return (savedOTPAt + fiveMinutesInMillis) < now;
     }
 }
