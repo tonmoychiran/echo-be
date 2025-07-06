@@ -1,11 +1,17 @@
 package com.example.goppho.configs;
 
+import com.example.goppho.entities.UserAuthOTPEntity;
+import com.example.goppho.repositories.UserAuthOTPRepository;
+import com.example.goppho.security.OTPAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.firewall.HttpStatusRequestRejectedHandler;
 import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
@@ -14,6 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @EnableWebSecurity
 @Configuration
@@ -29,9 +36,27 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/auth/resend").permitAll()
                         .requestMatchers("/api/v1/auth/verification").permitAll()
                         .anyRequest().authenticated()
-                ).addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                );
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(OTPAuthenticationProvider otpAuthenticationProvider) {
+        return new ProviderManager(otpAuthenticationProvider);
+    }
+
+    @Bean
+    public OTPAuthenticationProvider otpAuthenticationProvider(UserDetailsService userDetailsService) {
+        return new OTPAuthenticationProvider(userDetailsService);
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(UserAuthOTPRepository userAuthOTPRepository) {
+        return userName -> {
+            Optional<UserAuthOTPEntity> otpEntity = userAuthOTPRepository.findFirstByUserUserEmailOrderByCreatedAtDesc(userName);
+            return otpEntity.orElseThrow(() -> new UsernameNotFoundException("OTP not found"));
+        };
     }
 
     @Bean
