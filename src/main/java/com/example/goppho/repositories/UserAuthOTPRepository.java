@@ -12,6 +12,5 @@ import java.util.Optional;
 
 @Repository
 public interface UserAuthOTPRepository extends JpaRepository<UserAuthOTPEntity, UserAuthOTPID> {
-    @Query(value = "SELECT * FROM user_auth_otp u WHERE u.user_id = :userId ORDER BY u.created_at DESC LIMIT 1", nativeQuery = true)
-    Optional<UserAuthOTPEntity> findFirstByUserOrderByCreatedAtDesc(@Param("userId") String userId);
+    Optional<UserAuthOTPEntity> findFirstByUserUserEmailOrderByCreatedAtDesc(String userEmail);
 }
