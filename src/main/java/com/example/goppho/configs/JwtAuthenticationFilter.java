@@ -34,6 +34,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        return path.equals("/api/v1/auth/login") || path.startsWith("/api/v1/auth/verification");
+    }
+
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -60,6 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
+
+            filterChain.doFilter(request, response);
         } catch (Exception e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             handlerExceptionResolver.resolveException(request, response, null, e);
