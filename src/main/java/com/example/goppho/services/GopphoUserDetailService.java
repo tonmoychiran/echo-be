@@ -1,7 +1,7 @@
 package com.example.goppho.services;
 
+import com.example.goppho.entities.UserAuthOTPEntity;
 import com.example.goppho.entities.UserEntity;
-import com.example.goppho.entities.UserPrincipalEntity;
 import com.example.goppho.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +28,6 @@ public class GopphoUserDetailService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        return new UserPrincipalEntity(user.get());
+        return new UserAuthOTPEntity(user.get());
     }
 }
