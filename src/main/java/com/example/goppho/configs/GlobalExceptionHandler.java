@@ -1,14 +1,18 @@
 package com.example.goppho.configs;
 
 
+import com.example.goppho.exceptions.AuthorizationHeaderMissingException;
 import com.example.goppho.responses.DetailedErrorResponse;
 import com.example.goppho.responses.Response;
 import com.example.goppho.responses.ValidationErrorResponse;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -79,6 +83,45 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<Response> handleExpiredJwtException(
+            Exception ex
+    ){
+        return new ResponseEntity<>(
+                new Response(ex.getMessage()),
+                HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<Response> handleSignatureException(
+            Exception ex
+    ){
+        return new ResponseEntity<>(
+                new Response(ex.getMessage()),
+                HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(AuthorizationHeaderMissingException.class)
+    public ResponseEntity<Response> handleAuthorizationHeaderMissingException(
+            Exception ex
+    ){
+        return new ResponseEntity<>(
+                new Response(ex.getMessage()),
+                HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(InvalidBearerTokenException.class)
+    public ResponseEntity<Response> handleInvalidBearerTokenException(
+            Exception ex
+    ){
+        return new ResponseEntity<>(
+                new Response(ex.getMessage()),
+                HttpStatus.FORBIDDEN
+        );
+    }
 
     //http exceptions
     @ExceptionHandler(NoResourceFoundException.class)
