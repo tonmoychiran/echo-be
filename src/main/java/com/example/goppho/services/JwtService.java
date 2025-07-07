@@ -1,7 +1,6 @@
 package com.example.goppho.services;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +11,6 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 @Service
 public class JwtService {
@@ -31,13 +29,12 @@ public class JwtService {
 
     public String generateToken(String subject) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, subject, exp);
+        return createToken(claims, subject);
     }
 
     public String createToken(
             Map<String, Object> claims,
-            String subject,
-            long exp
+            String subject
     ) {
         return Jwts.builder()
                 .claims()
@@ -59,15 +56,8 @@ public class JwtService {
     public String extractSubject(
             String token
     ) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    private <T> T extractClaim(
-            String token,
-            Function<Claims, T> claimResolver
-    ) {
         final Claims claims = extractAllClaims(token);
-        return claimResolver.apply(claims);
+        return claims.getSubject();
     }
 
     private Claims extractAllClaims(
@@ -80,25 +70,6 @@ public class JwtService {
                 .getPayload();
     }
 
-    public boolean validateToken(
-            String token,
-            String id
-    ) {
-        final String subject = extractSubject(token);
-        return (subject.equals(id) && !isTokenExpired(token));
-    }
-
-    private boolean isTokenExpired(
-            String token
-    ) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(
-            String token
-    ) {
-        return extractClaim(token, Claims::getExpiration);
-    }
 
     public long getValidation() {
         return iat + exp;
