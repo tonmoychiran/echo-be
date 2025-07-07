@@ -1,0 +1,69 @@
+package com.example.goppho.configs;
+
+import com.example.goppho.entities.UserAuthOTPEntity;
+import com.example.goppho.exceptions.AuthorizationHeaderMissingException;
+import com.example.goppho.services.JwtService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+    private final HandlerExceptionResolver handlerExceptionResolver;
+
+    @Autowired
+    public JwtAuthenticationFilter(
+            JwtService jwtService,
+            UserDetailsService userDetailsService,
+            HandlerExceptionResolver handlerExceptionResolver
+    ) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+        this.handlerExceptionResolver = handlerExceptionResolver;
+    }
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) {
+        try {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader == null) {
+                throw new AuthorizationHeaderMissingException("Authorization header not found");
+            }
+
+            if (!authHeader.startsWith("Bearer ")) {
+                throw new InvalidBearerTokenException("Bearer token not found");
+            }
+
+            String token = authHeader.substring(7);
+
+            String userEmail = jwtService.extractSubject(token);
+            UserAuthOTPEntity userDetails = (UserAuthOTPEntity) userDetailsService.loadUserByUsername(userEmail);
+
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities()
+            );
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            handlerExceptionResolver.resolveException(request, response, null, e);
+        }
+
+    }
+}
