@@ -25,10 +25,10 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<UserEntity> searchByEmail(
-            @RequestParam("email") String email
+    public ResponseEntity<UserInformationEntity> searchByEmail(
+            @RequestParam("name") String name
     ) {
-        UserEntity user = this.userService.getUserByEmail(email);
+        UserInformationEntity user = this.userService.getUserByName(name);
         return ResponseEntity.ok(user);
     }
 
