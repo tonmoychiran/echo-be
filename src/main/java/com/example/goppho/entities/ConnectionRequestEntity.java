@@ -7,7 +7,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "connection_request",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"sender_id", "receiver_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"sender_user_id", "receiver_user_id"}))
 public class ConnectionRequestEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -22,7 +22,7 @@ public class ConnectionRequestEntity {
     private UserEntity receiver;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending'")
+    @Column(nullable = false)
     private ConnectionRequestStatus status = ConnectionRequestStatus.PENDING;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -30,6 +30,9 @@ public class ConnectionRequestEntity {
 
     @Column(name = "updated_at", nullable = false)
     private Long lastUpdatedAt;
+
+    public ConnectionRequestEntity() {
+    }
 
     public ConnectionRequestEntity(UserEntity sender, UserEntity receiver) {
         this.sender = sender;

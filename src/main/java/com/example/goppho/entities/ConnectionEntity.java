@@ -26,6 +26,9 @@ public class ConnectionEntity {
     @Column(name = "updated_at", nullable = false)
     private Long lastUpdatedAt;
 
+    public ConnectionEntity() {
+    }
+
     public ConnectionEntity(UserEntity head, UserEntity tail) {
         this.head = head;
         this.tail = tail;
