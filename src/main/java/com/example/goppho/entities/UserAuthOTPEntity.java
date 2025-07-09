@@ -63,7 +63,7 @@ public class UserAuthOTPEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.user.getUserEmail();
+        return this.user.getUserId();
     }
 
     @Override
