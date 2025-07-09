@@ -7,6 +7,7 @@ import com.example.goppho.repositories.UserInformationRepository;
 import com.example.goppho.repositories.UserRepository;
 import com.example.goppho.requests.UserDOBUpdateRequest;
 import com.example.goppho.requests.UserNameUpdateRequest;
+import com.example.goppho.responses.GetResponse;
 import com.example.goppho.responses.Response;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -43,12 +44,14 @@ public class UserService {
         return this.userRepository.findById(userId);
     }
 
-    public UserInformationEntity getUserInformationByEmail(UserDetails userDetails) {
+    public GetResponse<UserInformationEntity> getUserInformationByEmail(UserDetails userDetails) {
         UserAuthOTPEntity userAuthOTPEntity = (UserAuthOTPEntity) userDetails;
         UserEntity user = userAuthOTPEntity.getUser();
 
         Optional<UserInformationEntity> userInformation = this.userInformationRepository.findByUser(user);
-        return userInformation.orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UserInformationEntity userInformationEntity = userInformation.orElse(null);
+
+        return new GetResponse<>("User Information", userInformationEntity);
     }
 
     public UserInformationEntity getUserByName(String name) {

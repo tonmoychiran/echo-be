@@ -1,13 +1,14 @@
 package com.example.goppho.controllers;
 
-import com.example.goppho.entities.UserEntity;
 import com.example.goppho.entities.UserInformationEntity;
 import com.example.goppho.requests.UserDOBUpdateRequest;
 import com.example.goppho.requests.UserNameUpdateRequest;
+import com.example.goppho.responses.GetResponse;
 import com.example.goppho.responses.Response;
 import com.example.goppho.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,11 +34,14 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<UserInformationEntity> getUserProfile(
+    public ResponseEntity<GetResponse<UserInformationEntity>> getUserProfile(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        UserInformationEntity user = this.userService.getUserInformationByEmail(userDetails);
-        return ResponseEntity.ok(user);
+        GetResponse<UserInformationEntity> response = this.userService.getUserInformationByEmail(userDetails);
+        return new ResponseEntity<>(
+                response,
+                HttpStatus.OK
+        );
     }
 
     @PutMapping("/name")
