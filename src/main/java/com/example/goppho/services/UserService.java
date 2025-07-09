@@ -34,21 +34,32 @@ public class UserService {
         this.userInformationRepository = userInformationRepository;
     }
 
-    @Transactional
     protected List<UserEntity> getUserListById(List<String> userIds) {
         return this.userRepository.findAllById(userIds);
     }
 
-    @Transactional
     protected Optional<UserEntity> getUserById(String userId) {
         return this.userRepository.findById(userId);
+    }
+
+    protected Optional<UserInformationEntity> getUserInformationByUser(UserEntity user) {
+        return this.userInformationRepository.findByUser(user);
+    }
+
+    protected Optional<UserInformationEntity> getUserInformationByUserId(String userId) {
+        return this.userInformationRepository.findByUserUserId(userId);
+    }
+
+    protected UserEntity getUserFromUserDetails(UserDetails userDetails) {
+        UserAuthOTPEntity userAuthOTPEntity = (UserAuthOTPEntity) userDetails;
+        return userAuthOTPEntity.getUser();
     }
 
     public GetResponse<UserInformationEntity> getUserInformationByEmail(UserDetails userDetails) {
         UserAuthOTPEntity userAuthOTPEntity = (UserAuthOTPEntity) userDetails;
         UserEntity user = userAuthOTPEntity.getUser();
 
-        Optional<UserInformationEntity> userInformation = this.userInformationRepository.findByUser(user);
+        Optional<UserInformationEntity> userInformation = this.getUserInformationByUser(user);
         UserInformationEntity userInformationEntity = userInformation.orElse(null);
 
         return new GetResponse<>("User Information", userInformationEntity);
@@ -65,9 +76,8 @@ public class UserService {
     ) {
         String name = userNameUpdateRequest.getName();
 
-        UserAuthOTPEntity userAuthOTPEntity = (UserAuthOTPEntity) userDetails;
-        UserEntity user = userAuthOTPEntity.getUser();
-        Optional<UserInformationEntity> userInformation = this.userInformationRepository.findByUser(user);
+        UserEntity user = getUserFromUserDetails(userDetails);
+        Optional<UserInformationEntity> userInformation = this.getUserInformationByUser(user);
 
         if (userInformation.isPresent()) {
             UserInformationEntity updatableUserInformationEntity = userInformation.get();
@@ -87,9 +97,8 @@ public class UserService {
         LocalDate localDate = userDOBUpdateRequest.getDob();
         Date dob = Date.valueOf(localDate);
 
-        UserAuthOTPEntity userAuthOTPEntity = (UserAuthOTPEntity) userDetails;
-        UserEntity user = userAuthOTPEntity.getUser();
-        Optional<UserInformationEntity> userInformation = this.userInformationRepository.findByUser(user);
+        UserEntity user = getUserFromUserDetails(userDetails);
+        Optional<UserInformationEntity> userInformation = this.getUserInformationByUser(user);
 
         if (userInformation.isEmpty()) {
             throw new EntityNotFoundException("Update failed");
