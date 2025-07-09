@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<UserInformationEntity> searchByEmail(
+    public ResponseEntity<UserInformationEntity> searchByName(
             @RequestParam("name") String name
     ) {
         UserInformationEntity user = this.userService.getUserByName(name);
