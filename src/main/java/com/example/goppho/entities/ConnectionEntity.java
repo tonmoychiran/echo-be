@@ -6,19 +6,19 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "connection",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"head_user_id", "tail_user_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"head_user_information_id", "tail_user_information_id"}))
 public class ConnectionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String connectionId;
 
     @ManyToOne
-    @JoinColumn(name = "head_user_id", nullable = false)
-    private UserEntity head;
+    @JoinColumn(name = "head_user_information_id", nullable = false)
+    private UserInformationEntity head;
 
     @ManyToOne
-    @JoinColumn(name = "tail_user_id", nullable = false)
-    private UserEntity tail;
+    @JoinColumn(name = "tail_user_information_id", nullable = false)
+    private UserInformationEntity tail;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Long createdAt;
@@ -29,7 +29,7 @@ public class ConnectionEntity {
     public ConnectionEntity() {
     }
 
-    public ConnectionEntity(UserEntity head, UserEntity tail) {
+    public ConnectionEntity(UserInformationEntity head, UserInformationEntity tail) {
         this.head = head;
         this.tail = tail;
     }
@@ -42,19 +42,19 @@ public class ConnectionEntity {
         this.connectionId = connectionId;
     }
 
-    public UserEntity getHead() {
+    public UserInformationEntity getHead() {
         return head;
     }
 
-    public void setHead(UserEntity head) {
+    public void setHead(UserInformationEntity head) {
         this.head = head;
     }
 
-    public UserEntity getTail() {
+    public UserInformationEntity getTail() {
         return tail;
     }
 
-    public void setTail(UserEntity tail) {
+    public void setTail(UserInformationEntity tail) {
         this.tail = tail;
     }
 
@@ -89,7 +89,7 @@ public class ConnectionEntity {
     }
 
     public void validateSenderReceiver() {
-        if (head != null && tail != null && head.getUserId().equals(tail.getUserId())) {
+        if (head != null && tail != null && head.getUser().equals(tail.getUser())) {
             throw new IllegalArgumentException("User can not be connected with themselves");
         }
     }

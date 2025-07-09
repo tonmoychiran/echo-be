@@ -1,29 +1,29 @@
 package com.example.goppho.entities;
 
-import com.example.goppho.ConnectionRequestStatus;
+import com.example.goppho.enums.ConnectionRequestStatusEnum;
 import jakarta.persistence.*;
 
 import java.time.Instant;
 
 @Entity
 @Table(name = "connection_request",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"sender_user_id", "receiver_user_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"sender_user_information_id", "receiver_user_information_id"}))
 public class ConnectionRequestEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String connectionRequestId;
 
     @ManyToOne
-    @JoinColumn(name = "sender_user_id", nullable = false)
-    private UserEntity sender;
+    @JoinColumn(name = "sender_user_information_id", nullable = false)
+    private UserInformationEntity sender;
 
     @ManyToOne
-    @JoinColumn(name = "receiver_user_id", nullable = false)
-    private UserEntity receiver;
+    @JoinColumn(name = "receiver_user_information_id", nullable = false)
+    private UserInformationEntity receiver;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ConnectionRequestStatus status = ConnectionRequestStatus.PENDING;
+    private ConnectionRequestStatusEnum status = ConnectionRequestStatusEnum.PENDING;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Long createdAt;
@@ -34,7 +34,7 @@ public class ConnectionRequestEntity {
     public ConnectionRequestEntity() {
     }
 
-    public ConnectionRequestEntity(UserEntity sender, UserEntity receiver) {
+    public ConnectionRequestEntity(UserInformationEntity sender, UserInformationEntity receiver) {
         this.sender = sender;
         this.receiver = receiver;
     }
@@ -47,27 +47,27 @@ public class ConnectionRequestEntity {
         this.connectionRequestId = connectionRequestId;
     }
 
-    public UserEntity getSender() {
+    public UserInformationEntity getSender() {
         return sender;
     }
 
-    public void setSender(UserEntity sender) {
+    public void setSender(UserInformationEntity sender) {
         this.sender = sender;
     }
 
-    public UserEntity getReceiver() {
+    public UserInformationEntity getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(UserEntity receiver) {
+    public void setReceiver(UserInformationEntity receiver) {
         this.receiver = receiver;
     }
 
-    public ConnectionRequestStatus getStatus() {
+    public ConnectionRequestStatusEnum getStatus() {
         return status;
     }
 
-    public void setStatus(ConnectionRequestStatus status) {
+    public void setStatus(ConnectionRequestStatusEnum status) {
         this.status = status;
     }
 
@@ -102,7 +102,7 @@ public class ConnectionRequestEntity {
     }
 
     public void validateSenderReceiver() {
-        if (sender != null && receiver != null && sender.getUserId().equals(receiver.getUserId())) {
+        if (sender != null && receiver != null && sender.getUser().equals(receiver.getUser())) {
             throw new IllegalArgumentException("Sender and receiver cannot be the same user");
         }
     }
