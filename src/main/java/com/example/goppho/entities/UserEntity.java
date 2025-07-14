@@ -8,7 +8,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "users",
 indexes = {
-        @Index(name = "idx_users_user_name", columnList = "user_name"),
+        @Index(name = "idx_users_username", columnList = "username"),
         @Index(name = "idx_users_email", columnList = "email"),
         @Index(name = "idx_users_name", columnList = "name")
 })
@@ -19,7 +19,7 @@ public class UserEntity {
     private String userId;
 
     @Column(length = 50, unique = true, nullable = false)
-    private String userName;
+    private String username;
 
     @Column(length = 50, unique = true, nullable = false)
     private String email;
@@ -36,8 +36,8 @@ public class UserEntity {
     @Column(nullable = false)
     private Long lastUpdatedAt;
 
-    public UserEntity(String userName, String email, String name, Date dob) {
-        this.userName = userName;
+    public UserEntity(String username, String email, String name, Date dob) {
+        this.username = username;
         this.email = email;
         this.name = name;
         this.dob = dob;
@@ -55,12 +55,12 @@ public class UserEntity {
         this.userId = userId;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
