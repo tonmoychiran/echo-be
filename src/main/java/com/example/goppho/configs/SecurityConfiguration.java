@@ -59,7 +59,7 @@ public class SecurityConfiguration {
     @Bean
     public UserDetailsService userDetailsService(UserAuthOTPRepository userAuthOTPRepository) {
         return userEmail -> {
-            Optional<UserAuthOTPEntity> otpEntity = userAuthOTPRepository.findFirstByUserUserEmailOrderByCreatedAtDesc(userEmail);
+            Optional<UserAuthOTPEntity> otpEntity = userAuthOTPRepository.findFirstByUserEmailOrderByCreatedAtDesc(userEmail);
             return otpEntity.orElseThrow(() -> new UsernameNotFoundException("Invalid OTP"));
         };
     }
