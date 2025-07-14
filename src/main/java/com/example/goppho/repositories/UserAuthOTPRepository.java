@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface UserAuthOTPRepository extends JpaRepository<UserAuthOTPEntity, UserAuthOTPID> {
-    Optional<UserAuthOTPEntity> findFirstByUserUserEmailOrderByCreatedAtDesc(String userEmail);
+    Optional<UserAuthOTPEntity> findFirstByUserEmailOrderByCreatedAtDesc(String userEmail);
 }
