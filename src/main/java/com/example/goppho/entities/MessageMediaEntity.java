@@ -21,6 +21,10 @@ public class MessageMediaEntity {
         this.url = url;
     }
 
+    public MessageMediaEntity() {
+
+    }
+
     public String getMediaId() {
         return mediaId;
     }

@@ -42,6 +42,10 @@ public class MessageEntity {
         this.conversation = conversation;
     }
 
+    public MessageEntity() {
+
+    }
+
     public String getMessageId() {
         return messageId;
     }
@@ -92,7 +96,6 @@ public class MessageEntity {
 
     @PrePersist
     protected void onCreate() {
-        long now = Instant.now().toEpochMilli();
-        this.createdAt = now;
+        this.createdAt = Instant.now().toEpochMilli();
     }
 }

@@ -6,19 +6,23 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "connection",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"head_user_information_id", "tail_user_information_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "friend_id"}),
+        indexes = {
+                @Index(name = "idx_connection_user_id", columnList = "user_id"),
+                @Index(name = "idx_connection_friend_id", columnList = "friend_id"),
+        })
 public class ConnectionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String connectionId;
 
     @ManyToOne
-    @JoinColumn(name = "head_user_information_id", nullable = false)
-    private UserInformationEntity head;
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @ManyToOne
-    @JoinColumn(name = "tail_user_information_id", nullable = false)
-    private UserInformationEntity tail;
+    @JoinColumn(name = "friend_id", nullable = false)
+    private UserEntity friend;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Long createdAt;
@@ -29,9 +33,9 @@ public class ConnectionEntity {
     public ConnectionEntity() {
     }
 
-    public ConnectionEntity(UserInformationEntity head, UserInformationEntity tail) {
-        this.head = head;
-        this.tail = tail;
+    public ConnectionEntity(UserEntity user, UserEntity friend) {
+        this.user = user;
+        this.friend = friend;
     }
 
     public String getConnectionId() {
@@ -42,20 +46,20 @@ public class ConnectionEntity {
         this.connectionId = connectionId;
     }
 
-    public UserInformationEntity getHead() {
-        return head;
+    public UserEntity getHead() {
+        return user;
     }
 
-    public void setHead(UserInformationEntity head) {
-        this.head = head;
+    public void setHead(UserEntity user) {
+        this.user = user;
     }
 
-    public UserInformationEntity getTail() {
-        return tail;
+    public UserEntity getTail() {
+        return friend;
     }
 
-    public void setTail(UserInformationEntity tail) {
-        this.tail = tail;
+    public void setTail(UserEntity friend) {
+        this.friend = friend;
     }
 
     public Long getCreatedAt() {
@@ -89,7 +93,7 @@ public class ConnectionEntity {
     }
 
     public void validateSenderReceiver() {
-        if (head != null && tail != null && head.getUser().equals(tail.getUser())) {
+        if (user != null && user.equals(friend)) {
             throw new IllegalArgumentException("User can not be connected with themselves");
         }
     }

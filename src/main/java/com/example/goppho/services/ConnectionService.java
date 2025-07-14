@@ -2,7 +2,7 @@ package com.example.goppho.services;
 
 import com.example.goppho.entities.ConnectionEntity;
 import com.example.goppho.entities.ConnectionRequestEntity;
-import com.example.goppho.entities.UserInformationEntity;
+import com.example.goppho.entities.UserEntity;
 import com.example.goppho.enums.ConnectionRequestStatusEnum;
 import com.example.goppho.repositories.ConnectionRepository;
 import com.example.goppho.repositories.ConnectionRequestRepository;
@@ -41,31 +41,20 @@ public class ConnectionService {
     public GetResponse<List<ConnectionRequestEntity>> getReceivedConnectionRequests(
             UserDetails userDetails
     ) {
-        List<ConnectionRequestEntity> connectionRequests = new ArrayList<>();
-        Optional<UserInformationEntity> user = userService.getUserInformationByUserId(userDetails.getUsername());
-        if (user.isPresent()) {
-            connectionRequests = this.connectionRequestRepository.findAllByReceiverAndStatus(
-                    user.get(),
-                    ConnectionRequestStatusEnum.PENDING
-            );
-        }
-
+        UserEntity user = userService.getUserFromUserDetails(userDetails);
+        List<ConnectionRequestEntity> connectionRequests = this
+                .connectionRequestRepository
+                .findAllByReceiver(user);
         return new GetResponse<>("Connection Requests", connectionRequests);
-
     }
 
     public GetResponse<List<ConnectionRequestEntity>> getSentConnectionRequests(
             UserDetails userDetails
     ) {
-        List<ConnectionRequestEntity> connectionRequests = new ArrayList<>();
-        Optional<UserInformationEntity> user = userService.getUserInformationByUserId(userDetails.getUsername());
-        if (user.isPresent()) {
-            connectionRequests = this.connectionRequestRepository.findAllBySenderAndStatus(
-                    user.get(),
-                    ConnectionRequestStatusEnum.PENDING
-            );
-        }
-
+        UserEntity user = userService.getUserFromUserDetails(userDetails);
+        List<ConnectionRequestEntity> connectionRequests = this
+                .connectionRequestRepository
+                .findAllBySender(user);
         return new GetResponse<>("Connection Requests", connectionRequests);
     }
 
@@ -74,18 +63,14 @@ public class ConnectionService {
             UserDetails userDetails
     ) throws BadRequestException {
 
-        Optional<UserInformationEntity> senderUser = this.userService.getUserInformationByUserId(userDetails.getUsername());
-        if (senderUser.isEmpty()) {
-            throw new EntityNotFoundException("Sender not found");
-        }
+        UserEntity senderUserEntity = userService.getUserFromUserDetails(userDetails);
 
-        Optional<UserInformationEntity> receiverUser = this.userService.getUserInformationByUserId(connectionRequest.getUserId());
+        Optional<UserEntity> receiverUser = this.userService.getUserById(connectionRequest.getUserId());
         if (receiverUser.isEmpty()) {
             throw new EntityNotFoundException("Receiver not found");
         }
 
-        UserInformationEntity senderUserEntity = senderUser.get();
-        UserInformationEntity receiverUserEntity = receiverUser.get();
+        UserEntity receiverUserEntity = receiverUser.get();
 
         Optional<ConnectionRequestEntity> reverseRequest = this.connectionRequestRepository.findBySenderAndReceiver(receiverUserEntity, senderUserEntity);
         if (reverseRequest.isPresent()) {
@@ -97,7 +82,6 @@ public class ConnectionService {
             ConnectionRequestEntity connectionRequestEntity = identicalRequest.get();
             this.handleIdenticalConnectionRequest(connectionRequestEntity);
 
-            connectionRequestEntity.setStatus(ConnectionRequestStatusEnum.PENDING);
             this.connectionRequestRepository.save(connectionRequestEntity);
             return new Response("Request sent");
         }
@@ -124,8 +108,8 @@ public class ConnectionService {
         if (requestEntity.getStatus().equals(ConnectionRequestStatusEnum.REJECTED))
             throw new BadRequestException("Request already rejected");
 
-        UserInformationEntity sender = requestEntity.getSender();
-        UserInformationEntity receiver = requestEntity.getReceiver();
+        UserEntity sender = requestEntity.getSender();
+        UserEntity receiver = requestEntity.getReceiver();
 
         if (!receiver.getUser().getUserId().equals(userDetails.getUsername())) {
             throw new BadRequestException("Bad request");
@@ -159,8 +143,8 @@ public class ConnectionService {
         if (requestEntity.getStatus().equals(ConnectionRequestStatusEnum.REJECTED))
             throw new BadRequestException("Request already rejected");
 
-        UserInformationEntity sender = requestEntity.getSender();
-        UserInformationEntity receiver = requestEntity.getReceiver();
+        UserEntity sender = requestEntity.getSender();
+        UserEntity receiver = requestEntity.getReceiver();
 
         if (receiver.getUser().getUserId().equals(userDetails.getUsername())) {
             requestEntity.setStatus(ConnectionRequestStatusEnum.REJECTED);

@@ -66,7 +66,6 @@ public class ParticipantEntity {
 
     @PrePersist
     protected void onCreate() {
-        long now = Instant.now().toEpochMilli();
-        this.joinedAt = now;
+        this.joinedAt = Instant.now().toEpochMilli();
     }
 }
