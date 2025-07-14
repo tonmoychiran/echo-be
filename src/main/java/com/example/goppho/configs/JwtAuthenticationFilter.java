@@ -36,8 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-
-        return path.equals("/api/v1/auth/login") || path.startsWith("/api/v1/auth/verification");
+        return path.equals("/api/v1/auth/login") || path.equals("/api/v1/auth/verification");
     }
 
 
@@ -48,16 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) {
         try {
-            String authHeader = request.getHeader("Authorization");
-            if (authHeader == null) {
-                throw new AuthorizationHeaderMissingException("Authorization header not found");
-            }
-
-            if (!authHeader.startsWith("Bearer ")) {
-                throw new InvalidBearerTokenException("Bearer token not found");
-            }
-
-            String token = authHeader.substring(7);
+            String token = getToken(request);
 
             String userEmail = jwtService.extractSubject(token);
             UserAuthOTPEntity userDetails = (UserAuthOTPEntity) userDetailsService.loadUserByUsername(userEmail);
@@ -74,5 +64,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             handlerExceptionResolver.resolveException(request, response, null, e);
         }
 
+    }
+
+    private String getToken(
+            HttpServletRequest request
+    ) {
+        if (request.getRequestURI().equals("/chat")) {
+            String token = request.getParameter("token");
+            if (token == null || token.isBlank()) {
+                throw new AuthorizationHeaderMissingException("Token query parameter not found");
+            }
+            return token;
+        }
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null) {
+            throw new AuthorizationHeaderMissingException("Authorization header not found");
+        }
+
+        if (!authHeader.startsWith("Bearer ")) {
+            throw new InvalidBearerTokenException("Bearer token not found");
+        }
+
+        return authHeader.substring(7);
     }
 }
