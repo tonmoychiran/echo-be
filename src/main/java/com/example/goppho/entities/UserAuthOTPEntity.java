@@ -12,7 +12,10 @@ import java.util.List;
 
 @Entity
 @IdClass(UserAuthOTPID.class)
-@Table(name = "user_auth_otp")
+@Table(name = "user_auth_otp",
+        indexes = {
+                @Index(name = "idx_user_auth_otp_user_id", columnList = "user_id")
+        })
 public class UserAuthOTPEntity implements UserDetails {
     @Column(length = 6, unique = true, nullable = false)
     private String otp;
