@@ -6,7 +6,6 @@ import com.example.goppho.requests.UserLoginVerificationRequest;
 import com.example.goppho.entities.UserAuthOTPEntity;
 import com.example.goppho.entities.UserEntity;
 import com.example.goppho.repositories.UserAuthOTPRepository;
-import com.example.goppho.repositories.UserRepository;
 import com.example.goppho.responses.VerifiedUserLoginResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -19,41 +18,39 @@ import java.util.Optional;
 
 @Service
 public class UserAuthService {
-    private final AuthenticationManager authenticationManager;
+    UserService userService;
     private final JwtService jwtService;
-    UserAuthOTPRepository userAuthOTPRepository;
-    UserRepository userRepository;
     EmailSenderService emailSenderService;
+    UserAuthOTPRepository userAuthOTPRepository;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
     public UserAuthService(
-            AuthenticationManager authenticationManager,
-            UserAuthOTPRepository userAuthOTPRepository,
-            UserRepository userRepository,
+            UserService userService,
             JwtService jwtService,
-            EmailSenderService emailSenderService
+            EmailSenderService emailSenderService,
+            UserAuthOTPRepository userAuthOTPRepository,
+            AuthenticationManager authenticationManager
     ) {
-        this.authenticationManager = authenticationManager;
-        this.userAuthOTPRepository = userAuthOTPRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.jwtService = jwtService;
         this.emailSenderService = emailSenderService;
+        this.userAuthOTPRepository = userAuthOTPRepository;
+        this.authenticationManager = authenticationManager;
     }
 
     @Transactional
-    public Response generateUserLoginOTP(
+    public Response login(
             UserLoginOTPRequest userLoginRequest
     ) {
         String email = userLoginRequest.getEmail();
 
-        Optional<UserEntity> existingUser = this.userRepository.findByUserEmail(email);
-        UserEntity userEntity;
+        Optional<UserEntity> existingUser = this.userService.getUserByEmail(email);
+
         if (existingUser.isEmpty()) {
-            UserEntity newUser = new UserEntity(email);
-            userEntity = this.userRepository.save(newUser);
-        } else {
-            userEntity = existingUser.get();
+            throw new EntityNotFoundException("User not found");
         }
+        UserEntity userEntity = existingUser.get();
 
         UserAuthOTPEntity otpEntity = new UserAuthOTPEntity(userEntity);
         UserAuthOTPEntity savedOtp = this.userAuthOTPRepository.save(otpEntity);
@@ -68,13 +65,13 @@ public class UserAuthService {
     }
 
     @Transactional
-    public VerifiedUserLoginResponse verifyUserLoginOTP(
+    public VerifiedUserLoginResponse verifyOtp(
             UserLoginVerificationRequest userLoginVerifyRequest
     ) {
         String email = userLoginVerifyRequest.getEmail();
         String requestedOTP = userLoginVerifyRequest.getOtp();
 
-        Optional<UserEntity> existingUser = this.userRepository.findByUserEmail(email);
+        Optional<UserEntity> existingUser = this.userService.getUserByEmail(email);
         if (existingUser.isEmpty())
             throw new EntityNotFoundException("User not found");
 
