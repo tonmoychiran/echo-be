@@ -19,25 +19,27 @@ public class UserAuthController {
     private final UserAuthService userAuthService;
 
     @Autowired
-    public UserAuthController(UserAuthService userAuthService) {
+    public UserAuthController(
+            UserAuthService userAuthService
+    ) {
         this.userAuthService = userAuthService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Response> generateUserLoginOTP(
+    public ResponseEntity<Response> login(
             @Valid @RequestBody UserLoginOTPRequest userLoginRequest
     ) {
-        Response response = this.userAuthService.generateUserLoginOTP(
+        Response response = this.userAuthService.login(
                 userLoginRequest
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/verification")
-    public ResponseEntity<VerifiedUserLoginResponse> verifyUserLoginOTP(
+    public ResponseEntity<VerifiedUserLoginResponse> verifyOtp(
             @Valid @RequestBody UserLoginVerificationRequest userLoginVerifyRequest
     ) {
-        VerifiedUserLoginResponse response = this.userAuthService.verifyUserLoginOTP(
+        VerifiedUserLoginResponse response = this.userAuthService.verifyOtp(
                 userLoginVerifyRequest
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
