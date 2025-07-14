@@ -37,8 +37,8 @@ public class MessageService {
     @Transactional
     public MessageEntity createNewMessage(
             MessageRequest messageRequest,
-            String userId,
-            String conversationId
+            String conversationId,
+            String userId
     ) {
         Optional<UserEntity> userEntity = this.userService.getUserById(userId);
         if (userEntity.isEmpty())
