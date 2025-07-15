@@ -3,12 +3,17 @@ package com.example.echo.services;
 import com.example.echo.entities.UserAuthOTPEntity;
 import com.example.echo.entities.UserEntity;
 import com.example.echo.repositories.UserRepository;
+import com.example.echo.requests.UserRegistrationRequest;
 import com.example.echo.responses.GetResponse;
+import com.example.echo.responses.Response;
+import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +52,25 @@ public class UserService {
     ) {
         UserAuthOTPEntity userAuthOTPEntity = (UserAuthOTPEntity) userDetails;
         return userAuthOTPEntity.getUser();
+    }
+
+    @Transactional
+    public Response registration(
+            UserRegistrationRequest userRegistrationRequest
+    ) throws BadRequestException {
+        String email = userRegistrationRequest.getEmail();
+        String username = userRegistrationRequest.getUsername();
+        String name = userRegistrationRequest.getName();
+        LocalDate dob = userRegistrationRequest.getDob();
+        Date sqlDob = Date.valueOf(dob);
+
+        this.checkEmail(email);
+        this.checkUsername(username);
+
+        UserEntity userEntity=new UserEntity(username, email, name, sqlDob);
+        this.userRepository.save(userEntity);
+
+        return new Response("Registration successful");
     }
 
     public GetResponse<UserEntity> getUserProfile(

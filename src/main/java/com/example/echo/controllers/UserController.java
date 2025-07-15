@@ -2,8 +2,11 @@ package com.example.echo.controllers;
 
 import com.example.echo.entities.UserEntity;
 import com.example.echo.interfaces.UsernameValidator;
+import com.example.echo.requests.UserRegistrationRequest;
 import com.example.echo.responses.GetResponse;
+import com.example.echo.responses.Response;
 import com.example.echo.services.UserService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.apache.coyote.BadRequestException;
@@ -25,6 +28,16 @@ public class UserController {
             UserService userService
     ) {
         this.userService = userService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Response> register(
+            @Valid @RequestBody UserRegistrationRequest userRegistrationRequest
+    ) throws BadRequestException {
+        Response response=this.userService.registration(
+                userRegistrationRequest
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/profile")
@@ -58,4 +71,6 @@ public class UserController {
         this.userService.checkUsername(username);
         return ResponseEntity.ok().build();
     }
+
+
 }
