@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 
 public class UsernameValidator implements ConstraintValidator<com.example.echo.interfaces.UsernameValidator, String> {
 
-    private static final String USERNAME_REGEX = "^[a-zA-Z0-9_.]$";
+    private static final String USERNAME_REGEX = "^[a-zA-Z0-9_.]+$";
     private static final Pattern PATTERN = Pattern.compile(USERNAME_REGEX);
 
     @Override
