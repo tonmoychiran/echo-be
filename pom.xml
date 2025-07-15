@@ -9,10 +9,10 @@
         <relativePath/>
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>goppho</artifactId>
+    <artifactId>echo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>goppho</name>
-    <description>goppho</description>
+    <name>echo</name>
+    <description>echo - a messaging webapp</description>
     <url/>
     <licenses>
         <license/>
