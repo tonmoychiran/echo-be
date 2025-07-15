@@ -3,7 +3,6 @@ package com.example.goppho.services;
 import com.example.goppho.entities.ConnectionEntity;
 import com.example.goppho.entities.ConnectionRequestEntity;
 import com.example.goppho.entities.UserEntity;
-import com.example.goppho.enums.ConnectionRequestStatusEnum;
 import com.example.goppho.repositories.ConnectionRepository;
 import com.example.goppho.repositories.ConnectionRequestRepository;
 import com.example.goppho.requests.ConnectionActionRequest;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,30 +61,30 @@ public class ConnectionService {
             UserDetails userDetails
     ) throws BadRequestException {
 
-        UserEntity senderUserEntity = userService.getUserFromUserDetails(userDetails);
+        UserEntity userEntity = userService.getUserFromUserDetails(userDetails);
 
-        Optional<UserEntity> receiverUser = this.userService.getUserById(connectionRequest.getUserId());
-        if (receiverUser.isEmpty()) {
+        Optional<UserEntity> friendUser = this.userService.getUserById(connectionRequest.getUserId());
+        if (friendUser.isEmpty()) {
             throw new EntityNotFoundException("Receiver not found");
         }
 
-        UserEntity receiverUserEntity = receiverUser.get();
-
-        Optional<ConnectionRequestEntity> reverseRequest = this.connectionRequestRepository.findBySenderAndReceiver(receiverUserEntity, senderUserEntity);
-        if (reverseRequest.isPresent()) {
-            handleReverseConnectionRequest(reverseRequest.get());
+        UserEntity friendEntity = friendUser.get();
+        Optional<ConnectionEntity> isAlreadyFriends = this.connectionRepository.findByUserAndFriend(userEntity, friendEntity);
+        if (isAlreadyFriends.isPresent()) {
+            throw new BadRequestException("User is already a friend");
         }
 
-        Optional<ConnectionRequestEntity> identicalRequest = this.connectionRequestRepository.findBySenderAndReceiver(senderUserEntity, receiverUserEntity);
+        Optional<ConnectionRequestEntity> identicalRequest = this.connectionRequestRepository.findBySenderAndReceiver(userEntity, friendEntity);
         if (identicalRequest.isPresent()) {
-            ConnectionRequestEntity connectionRequestEntity = identicalRequest.get();
-            this.handleIdenticalConnectionRequest(connectionRequestEntity);
-
-            this.connectionRequestRepository.save(connectionRequestEntity);
-            return new Response("Request sent");
+            throw new BadRequestException("Request already sent");
         }
 
-        ConnectionRequestEntity connectionRequestEntity = new ConnectionRequestEntity(senderUserEntity, receiverUserEntity);
+        Optional<ConnectionRequestEntity> reverseRequest = this.connectionRequestRepository.findBySenderAndReceiver(userEntity, friendEntity);
+        if (reverseRequest.isPresent()) {
+            throw new BadRequestException("User already sent you a connection request");
+        }
+
+        ConnectionRequestEntity connectionRequestEntity = new ConnectionRequestEntity(userEntity, friendEntity);
         this.connectionRequestRepository.save(connectionRequestEntity);
 
         return new Response("Request sent");
@@ -103,27 +101,20 @@ public class ConnectionService {
             throw new EntityNotFoundException("Request not found");
 
         ConnectionRequestEntity requestEntity = request.get();
-        if (requestEntity.getStatus().equals(ConnectionRequestStatusEnum.ACCEPTED))
-            throw new BadRequestException("Request already accepted");
-        if (requestEntity.getStatus().equals(ConnectionRequestStatusEnum.REJECTED))
-            throw new BadRequestException("Request already rejected");
 
-        UserEntity sender = requestEntity.getSender();
-        UserEntity receiver = requestEntity.getReceiver();
+        UserEntity userEntity = requestEntity.getSender();
+        UserEntity friendEntity = requestEntity.getReceiver();
 
-        if (!receiver.getUser().getUserId().equals(userDetails.getUsername())) {
+        if (!friendEntity.getUserId().equals(userDetails.getUsername())) {
             throw new BadRequestException("Bad request");
         }
 
-        requestEntity.setStatus(ConnectionRequestStatusEnum.ACCEPTED);
-
-        this.connectionRequestRepository.save(requestEntity);
-
-        ConnectionEntity connectionForSender = new ConnectionEntity(sender, receiver);
-        ConnectionEntity connectionForReceiver = new ConnectionEntity(receiver, sender);
+        ConnectionEntity connectionForSender = new ConnectionEntity(userEntity, friendEntity);
+        ConnectionEntity connectionForReceiver = new ConnectionEntity(friendEntity, userEntity);
 
         this.connectionRepository.save(connectionForSender);
         this.connectionRepository.save(connectionForReceiver);
+        this.connectionRequestRepository.delete(requestEntity);
 
         return new Response("Accepted");
     }
@@ -138,21 +129,14 @@ public class ConnectionService {
             throw new EntityNotFoundException("Request not found");
 
         ConnectionRequestEntity requestEntity = request.get();
-        if (requestEntity.getStatus().equals(ConnectionRequestStatusEnum.ACCEPTED))
-            throw new BadRequestException("Request already accepted");
-        if (requestEntity.getStatus().equals(ConnectionRequestStatusEnum.REJECTED))
-            throw new BadRequestException("Request already rejected");
 
-        UserEntity sender = requestEntity.getSender();
-        UserEntity receiver = requestEntity.getReceiver();
+        UserEntity userEntity = requestEntity.getSender();
+        UserEntity friendEntity = requestEntity.getReceiver();
 
-        if (receiver.getUser().getUserId().equals(userDetails.getUsername())) {
-            requestEntity.setStatus(ConnectionRequestStatusEnum.REJECTED);
-            this.connectionRequestRepository.save(requestEntity);
+        this.connectionRequestRepository.delete(requestEntity);
+        if (friendEntity.getUserId().equals(userDetails.getUsername())) {
             return new Response("Rejected");
-        } else if (sender.getUser().getUserId().equals(userDetails.getUsername())) {
-            requestEntity.setStatus(ConnectionRequestStatusEnum.REJECTED);
-            this.connectionRequestRepository.save(requestEntity);
+        } else if (userEntity.getUserId().equals(userDetails.getUsername())) {
             return new Response("Cancelled");
         }
 
@@ -160,25 +144,4 @@ public class ConnectionService {
 
     }
 
-
-    protected void handleIdenticalConnectionRequest(
-            ConnectionRequestEntity connectionRequestEntity
-    ) throws BadRequestException {
-
-        if (connectionRequestEntity.getStatus().equals(ConnectionRequestStatusEnum.PENDING))
-            throw new BadRequestException("Request already sent");
-        if (connectionRequestEntity.getStatus().equals(ConnectionRequestStatusEnum.ACCEPTED))
-            throw new BadRequestException("Connection request already accepted");
-
-    }
-
-    protected void handleReverseConnectionRequest(
-            ConnectionRequestEntity connectionRequestEntity
-    ) throws BadRequestException {
-
-        if (connectionRequestEntity.getStatus().equals(ConnectionRequestStatusEnum.PENDING))
-            throw new BadRequestException("User already sent you a connection request");
-        if (connectionRequestEntity.getStatus().equals(ConnectionRequestStatusEnum.ACCEPTED))
-            throw new BadRequestException("User is already a friend");
-    }
 }
