@@ -41,9 +41,15 @@ public class UserService {
         return this.userRepository.findById(userId);
     }
 
+    protected Optional<UserEntity> getUserByUsername(
+            String username
+    ) {
+        return this.userRepository.findByUsername(username);
+    }
+
     protected Optional<UserEntity> getUserByEmail(
             String email
-    ){
+    ) {
         return this.userRepository.findByEmail(email);
     }
 
@@ -67,7 +73,7 @@ public class UserService {
         this.checkEmail(email);
         this.checkUsername(username);
 
-        UserEntity userEntity=new UserEntity(username, email, name, sqlDob);
+        UserEntity userEntity = new UserEntity(username, email, name, sqlDob);
         this.userRepository.save(userEntity);
 
         return new Response("Registration successful");

@@ -63,7 +63,7 @@ public class ConnectionService {
 
         UserEntity userEntity = userService.getUserFromUserDetails(userDetails);
 
-        Optional<UserEntity> friendUser = this.userService.getUserById(connectionRequest.getUserId());
+        Optional<UserEntity> friendUser = this.userService.getUserByUsername(connectionRequest.getUsername());
         if (friendUser.isEmpty()) {
             throw new EntityNotFoundException("Receiver not found");
         }
