@@ -30,7 +30,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
+    @PostMapping("/registration")
     public ResponseEntity<Response> register(
             @Valid @RequestBody UserRegistrationRequest userRegistrationRequest
     ) throws BadRequestException {
