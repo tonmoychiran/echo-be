@@ -46,19 +46,19 @@ public class ConnectionEntity {
         this.connectionId = connectionId;
     }
 
-    public UserEntity getHead() {
+    public UserEntity getUser() {
         return user;
     }
 
-    public void setHead(UserEntity user) {
+    public void setUser(UserEntity user) {
         this.user = user;
     }
 
-    public UserEntity getTail() {
+    public UserEntity getFriend() {
         return friend;
     }
 
-    public void setTail(UserEntity friend) {
+    public void setFriend(UserEntity friend) {
         this.friend = friend;
     }
 

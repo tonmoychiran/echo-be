@@ -1,5 +1,6 @@
 package com.example.echo.controllers;
 
+import com.example.echo.entities.ConnectionEntity;
 import com.example.echo.entities.ConnectionRequestEntity;
 import com.example.echo.requests.ConnectionActionRequest;
 import com.example.echo.requests.ConnectionRequest;
@@ -41,6 +42,14 @@ public class ConnectionController {
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         GetResponse<List<ConnectionRequestEntity>> response = this.connectionService.getReceivedConnectionRequests(userDetails);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/connected")
+    public ResponseEntity<GetResponse<List<ConnectionEntity>>> getConnectedList(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        GetResponse<List<ConnectionEntity>> response = this.connectionService.getConnectedList(userDetails);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

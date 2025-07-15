@@ -56,6 +56,16 @@ public class ConnectionService {
         return new GetResponse<>("Connection Requests", connectionRequests);
     }
 
+    public GetResponse<List<ConnectionEntity>> getConnectedList(
+            UserDetails userDetails
+    ){
+        UserEntity user = userService.getUserFromUserDetails(userDetails);
+        List<ConnectionEntity> connectedList = this
+                .connectionRepository
+                .findAllByUser(user);
+        return new GetResponse<>("Friends List", connectedList);
+    }
+
     public Response sendConnectionRequest(
             ConnectionRequest connectionRequest,
             UserDetails userDetails
