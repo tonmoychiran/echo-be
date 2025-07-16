@@ -1,74 +1,94 @@
 package com.example.echo.services;
 
+import com.example.echo.dtos.MessageDTO;
 import com.example.echo.entities.ConversationEntity;
 import com.example.echo.entities.MessageEntity;
 import com.example.echo.entities.ParticipantEntity;
 import com.example.echo.entities.UserEntity;
 import com.example.echo.repositories.MessageRepository;
 import com.example.echo.requests.MessageRequest;
-import com.example.echo.responses.MessageResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class MessageService {
 
-    MessageRepository messageRepository;
     UserService userService;
-    ConversationService conversationService;
+    WebSocketService webSocketService;
+    MessageRepository messageRepository;
     ParticipantService participantService;
+    ConversationService conversationService;
 
     @Autowired
     public MessageService(
-            MessageRepository messageRepository,
             UserService userService,
-            ConversationService conversationService,
-            ParticipantService participantService
+            WebSocketService webSocketService,
+            MessageRepository messageRepository,
+            ParticipantService participantService,
+            ConversationService conversationService
     ) {
-        this.messageRepository = messageRepository;
         this.userService = userService;
-        this.conversationService = conversationService;
+        this.webSocketService = webSocketService;
+        this.messageRepository = messageRepository;
         this.participantService = participantService;
+        this.conversationService = conversationService;
     }
 
     @Transactional
-    public MessageResponse createNewMessage(
-            MessageRequest messageRequest,
-            String conversationId,
-            String userId
+    protected MessageDTO saveMessage(
+            String message,
+            UserEntity user,
+            ConversationEntity conversation
     ) {
-        Optional<UserEntity> userEntity = this.userService.getUserById(userId);
-        if (userEntity.isEmpty())
-            throw new EntityNotFoundException("User not found");
-
-        Optional<ConversationEntity> conversationEntity = this.conversationService.getConversationById(conversationId);
-        if (conversationEntity.isEmpty())
-            throw new EntityNotFoundException("Conversation not found");
-
-        UserEntity user = userEntity.get();
-        ConversationEntity conversation = conversationEntity.get();
-
-        Optional<ParticipantEntity> participantEntity = this.participantService.getParticipantByUserAndConversation(user, conversation);
-        if (participantEntity.isEmpty())
-            throw new EntityNotFoundException("User not allowed");
-
-        MessageEntity message = new MessageEntity(
-                messageRequest.getMessage(),
+        MessageEntity newMessage = new MessageEntity(
+                message,
                 user,
                 conversation
         );
 
-        MessageEntity messageEntity =messageRepository.save(message);
-        return new MessageResponse(
-                messageEntity.getMessageId(),
-                messageEntity.getMessage(),
-                messageEntity.getCreatedAt(),
-                messageEntity.getUser(),
-                messageEntity.getConversation().getConversationId()
+        MessageEntity savedMessage = this.messageRepository.save(newMessage);
+        return new MessageDTO(
+                savedMessage.getMessageId(),
+                savedMessage.getMessage(),
+                savedMessage.getCreatedAt(),
+                savedMessage.getUser(),
+                savedMessage.getConversation().getConversationId()
         );
     }
+
+    @Transactional
+    public void createNewDMMessage(
+            MessageRequest messageRequest,
+            Principal principal
+    ) {
+        String userId = principal.getName();
+
+        Optional<UserEntity> userEntity = this.userService.getUserById(userId);
+        if (userEntity.isEmpty())
+            throw new EntityNotFoundException("User not found");
+
+        Optional<ConversationEntity> conversationEntity = this.conversationService.getConversationById(messageRequest.getConversationId());
+        if (conversationEntity.isEmpty())
+            throw new EntityNotFoundException("Conversation not found");
+        ConversationEntity conversation = conversationEntity.get();
+
+        List<ParticipantEntity> participantEntities=this.participantService.getParticipantsByConversation(conversation);
+
+        UserEntity user = userEntity.get();
+        String message = messageRequest.getMessage();
+
+
+
+
+        MessageDTO savedMessage = this.saveMessage(message, user, conversation);
+
+
+    }
+
 }

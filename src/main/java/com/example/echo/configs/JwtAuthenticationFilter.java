@@ -73,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getToken(
             HttpServletRequest request
     ) {
-        if (request.getRequestURI().equals("/chat")) {
+        if (request.getRequestURI().equals("/ws")) {
             String token = request.getParameter("token");
             if (token == null || token.isBlank()) {
                 throw new AuthorizationHeaderMissingException("Token query parameter not found");

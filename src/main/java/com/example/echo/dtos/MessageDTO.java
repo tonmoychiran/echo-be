@@ -1,15 +1,17 @@
-package com.example.echo.responses;
+package com.example.echo.dtos;
 
 import com.example.echo.entities.UserEntity;
+import com.example.echo.enums.PublishableEnum;
+import com.example.echo.interfaces.Publishable;
 
-public class MessageResponse {
+public class MessageDTO implements Publishable {
     private String messageId;
     private String message;
     private Long createdAt;
     private UserEntity user;
     private String conversationId;
 
-    public MessageResponse(String messageId, String message, Long createdAt, UserEntity user, String conversationId) {
+    public MessageDTO(String messageId, String message, Long createdAt, UserEntity user, String conversationId) {
         this.messageId = messageId;
         this.message = message;
         this.createdAt = createdAt;
@@ -18,6 +20,10 @@ public class MessageResponse {
     }
 
     // Getters and setters
+    public PublishableEnum getType() {
+        return PublishableEnum.MESSAGE;
+    }
+
     public String getMessageId() {
         return messageId;
     }

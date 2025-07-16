@@ -42,4 +42,11 @@ public class ParticipantService {
     ) {
         return this.participantRepository.findByUserAndConversation(user, conversation);
     }
+
+    @Transactional
+    protected List<ParticipantEntity> getParticipantsByConversation(
+            ConversationEntity conversation
+    ) {
+        return this.participantRepository.findAllByConversation(conversation);
+    }
 }
