@@ -6,6 +6,7 @@ import com.example.echo.entities.ParticipantEntity;
 import com.example.echo.entities.UserEntity;
 import com.example.echo.repositories.MessageRepository;
 import com.example.echo.requests.MessageRequest;
+import com.example.echo.responses.MessageResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class MessageService {
     }
 
     @Transactional
-    public MessageEntity createNewMessage(
+    public MessageResponse createNewMessage(
             MessageRequest messageRequest,
             String conversationId,
             String userId
@@ -61,6 +62,13 @@ public class MessageService {
                 conversation
         );
 
-        return messageRepository.save(message);
+        MessageEntity messageEntity =messageRepository.save(message);
+        return new MessageResponse(
+                messageEntity.getMessageId(),
+                messageEntity.getMessage(),
+                messageEntity.getCreatedAt(),
+                messageEntity.getUser(),
+                messageEntity.getConversation().getConversationId()
+        );
     }
 }

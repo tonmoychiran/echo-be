@@ -1,7 +1,7 @@
 package com.example.echo.controllers;
 
-import com.example.echo.entities.MessageEntity;
 import com.example.echo.requests.MessageRequest;
+import com.example.echo.responses.MessageResponse;
 import com.example.echo.services.MessageService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class MessageController {
 
     @MessageMapping("/message/{conversationId}")
     @SendTo("/topic/{conversationId}")
-    public MessageEntity greeting(
+    public MessageResponse greeting(
             @Valid MessageRequest messageRequest,
             @DestinationVariable String conversationId,
             Principal principal
