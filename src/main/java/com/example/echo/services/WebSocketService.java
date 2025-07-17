@@ -20,9 +20,8 @@ public class WebSocketService {
     protected void publishToUserList(List<UserEntity> userList, Publishable payload) {
         userList.forEach(
                 user -> {
-                    messagingTemplate.convertAndSend("/outbox/" + user.getUserId(), payload);
+                    messagingTemplate.convertAndSend("/inbox/" + user.getUserId(), payload);
                 }
         );
-
     }
 }
