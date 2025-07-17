@@ -22,7 +22,7 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @MessageMapping("")
+    @MessageMapping("/send")
     public void createNewDMMessage(
             @Valid MessageRequest messageRequest,
             Principal principal
