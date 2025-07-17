@@ -36,15 +36,15 @@ public class ParticipantService {
     }
 
     @Transactional
-    protected Optional<ParticipantEntity> getParticipantByUserAndConversation(
+    protected Boolean isParticipantAllowed(
             UserEntity user,
             ConversationEntity conversation
     ) {
-        return this.participantRepository.findByUserAndConversation(user, conversation);
+        return this.participantRepository.existsByUserAndConversation(user, conversation);
     }
 
     @Transactional
-    protected List<ParticipantEntity> getParticipantsByConversation(
+    protected List<ParticipantEntity> getParticipantListByConversation(
             ConversationEntity conversation
     ) {
         return this.participantRepository.findAllByConversation(conversation);

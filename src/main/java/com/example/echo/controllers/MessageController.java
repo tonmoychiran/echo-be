@@ -3,6 +3,7 @@ package com.example.echo.controllers;
 import com.example.echo.requests.MessageRequest;
 import com.example.echo.services.MessageService;
 import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
@@ -22,12 +23,12 @@ public class MessageController {
     }
 
     @MessageMapping("")
-    public MessageResponse createNewDMMessage(
+    public void createNewDMMessage(
             @Valid MessageRequest messageRequest,
             Principal principal
-    ) {
+    ) throws BadRequestException {
 
-        return messageService.createNewDMMessage(
+        messageService.createNewDMMessage(
                 messageRequest,
                 principal
         );

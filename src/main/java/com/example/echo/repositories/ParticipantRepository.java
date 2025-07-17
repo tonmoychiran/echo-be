@@ -10,5 +10,6 @@ import java.util.Optional;
 
 public interface ParticipantRepository extends JpaRepository<ParticipantEntity, String> {
     Optional<ParticipantEntity> findByUserAndConversation(UserEntity user, ConversationEntity conversation);
+    boolean existsByUserAndConversation(UserEntity user, ConversationEntity conversation);
     List<ParticipantEntity> findAllByConversation(ConversationEntity conversation);
 }

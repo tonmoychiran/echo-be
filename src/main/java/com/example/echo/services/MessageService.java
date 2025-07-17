@@ -9,12 +9,14 @@ import com.example.echo.repositories.MessageRepository;
 import com.example.echo.requests.MessageRequest;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class MessageService {
@@ -66,7 +68,7 @@ public class MessageService {
     public void createNewDMMessage(
             MessageRequest messageRequest,
             Principal principal
-    ) {
+    ) throws BadRequestException {
         String userId = principal.getName();
 
         Optional<UserEntity> userEntity = this.userService.getUserById(userId);
@@ -76,19 +78,18 @@ public class MessageService {
         Optional<ConversationEntity> conversationEntity = this.conversationService.getConversationById(messageRequest.getConversationId());
         if (conversationEntity.isEmpty())
             throw new EntityNotFoundException("Conversation not found");
-        ConversationEntity conversation = conversationEntity.get();
-
-        List<ParticipantEntity> participantEntities=this.participantService.getParticipantsByConversation(conversation);
 
         UserEntity user = userEntity.get();
         String message = messageRequest.getMessage();
+        ConversationEntity conversation = conversationEntity.get();
 
-
-
+        List<ParticipantEntity> participantEntities = this.participantService.getParticipantListByConversation(conversation);
+        List<UserEntity> participantUserList=participantEntities.stream().map(
+                ParticipantEntity::getUser
+        ).toList();
 
         MessageDTO savedMessage = this.saveMessage(message, user, conversation);
-
-
+        this.webSocketService.publishToUserList(participantUserList, savedMessage);
     }
 
 }

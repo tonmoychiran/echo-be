@@ -1,8 +1,11 @@
 package com.example.echo.services;
 
+import com.example.echo.entities.UserEntity;
 import com.example.echo.interfaces.Publishable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class WebSocketService {
@@ -10,11 +13,16 @@ public class WebSocketService {
 
     public WebSocketService(
             SimpMessagingTemplate messagingTemplate
-    ){
+    ) {
         this.messagingTemplate = messagingTemplate;
     }
 
-    protected void publishToUser(String userId, Publishable payload){
-        messagingTemplate.convertAndSend("/outbox/" + userId, payload);
+    protected void publishToUserList(List<UserEntity> userList, Publishable payload) {
+        userList.forEach(
+                user -> {
+                    messagingTemplate.convertAndSend("/outbox/" + user.getUserId(), payload);
+                }
+        );
+
     }
 }
