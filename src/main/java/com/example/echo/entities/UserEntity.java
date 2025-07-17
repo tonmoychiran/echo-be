@@ -30,6 +30,9 @@ public class UserEntity {
     @Column(nullable = false)
     private Date dob;
 
+    @Column(nullable = false)
+    private boolean online;
+
     @Column(nullable = false, updatable = false)
     private Long createdAt;
 
@@ -41,6 +44,7 @@ public class UserEntity {
         this.email = email;
         this.name = name;
         this.dob = dob;
+        this.online = false;
     }
 
     public UserEntity() {
@@ -85,6 +89,14 @@ public class UserEntity {
 
     public void setDob(Date dob) {
         this.dob = dob;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 
     public Long getCreatedAt() {

@@ -1,6 +1,8 @@
 package com.example.echo.configs;
 
-
+import com.example.echo.services.UserService;
+import com.example.echo.services.WebSocketService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -10,11 +12,18 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import java.security.Principal;
-
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
+
+    private final UserService userService; // Example service to inject
+
+
+    @Autowired
+    public WebSocketConfiguration(UserService userService) {
+        this.userService = userService;
+    }
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/inbox");
@@ -28,13 +37,11 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @EventListener
     public void handleSessionConnect(SessionConnectedEvent event) {
-        Principal principal = event.getUser();
-        //user online logic
+        this.userService.handleWebSocketSessionConnect(event.getUser());
     }
 
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
-        Principal principal = event.getUser();
-        //user offline logic
+        this.userService.handleWebSocketSessionDisconnect(event.getUser());
     }
 }

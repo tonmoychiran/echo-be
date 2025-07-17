@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
@@ -101,4 +102,41 @@ public class UserService {
             throw new BadRequestException("Username exists");
         }
     }
+
+    private void updateUserOnlineStatus(
+            UserEntity user,
+            boolean online
+    ) {
+        if (user.isOnline() == online)
+            return;
+        user.setOnline(online);
+        this.userRepository.save(user);
+    }
+
+    public void handleWebSocketSessionConnect(
+            Principal principal
+    ) {
+        if (principal == null)
+            return;
+
+        Optional<UserEntity> userEntity = this.getUserById(principal.getName());
+        if (userEntity.isPresent()) {
+            UserEntity user = userEntity.get();
+            user.setOnline(true);
+        }
+    }
+
+    public void handleWebSocketSessionDisconnect(
+            Principal principal
+    ) {
+        if (principal == null)
+            return;
+
+        Optional<UserEntity> userEntity = this.getUserById(principal.getName());
+        if (userEntity.isPresent()) {
+            UserEntity user = userEntity.get();
+            user.setOnline(false);
+        }
+    }
+
 }
