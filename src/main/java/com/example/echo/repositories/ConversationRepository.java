@@ -12,7 +12,7 @@ public interface ConversationRepository extends JpaRepository<ConversationEntity
     @Query(value = """
             SELECT c.* FROM conversation c
             JOIN participant p ON c.conversation_id = p.conversation_id
-            WHERE c.is_group = false 
+            WHERE c.is_group = false
             AND p.user_id IN (:userIds)
             GROUP BY c.conversation_id
             HAVING COUNT(DISTINCT p.user_id) = 2""",

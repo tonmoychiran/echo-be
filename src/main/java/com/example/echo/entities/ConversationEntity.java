@@ -21,9 +21,6 @@ public class ConversationEntity {
     @Column
     private Long createdAt;
 
-    @OneToMany(mappedBy = "conversation")
-    private List<ParticipantEntity> participants;
-
     public ConversationEntity(String conversationName) {
         this.conversationName = conversationName;
         this.isGroup = true;
@@ -62,14 +59,6 @@ public class ConversationEntity {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public List<ParticipantEntity> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(List<ParticipantEntity> participants) {
-        this.participants = participants;
     }
 
     @PrePersist
