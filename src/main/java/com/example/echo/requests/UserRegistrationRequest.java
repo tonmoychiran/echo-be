@@ -1,6 +1,6 @@
 package com.example.echo.requests;
 
-import com.example.echo.interfaces.UsernameValidator;
+import com.example.echo.annotations.ValidUsername;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,7 +27,7 @@ public class UserRegistrationRequest {
 
     @NotBlank(message = "Username is empty")
     @Length(max = 50, message = "Username exceeds 50 characters")
-    @UsernameValidator
+    @ValidUsername
     String username;
 
     public @NotBlank(message = "Name is empty") @Length(max = 50, message = "Name exceeds 50 characters") String getName() {

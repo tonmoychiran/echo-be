@@ -1,7 +1,7 @@
 package com.example.echo.controllers;
 
 import com.example.echo.entities.UserEntity;
-import com.example.echo.interfaces.UsernameValidator;
+import com.example.echo.annotations.ValidUsername;
 import com.example.echo.requests.UserRegistrationRequest;
 import com.example.echo.responses.GetResponse;
 import com.example.echo.responses.Response;
@@ -65,7 +65,7 @@ public class UserController {
     public ResponseEntity<Void> checkUsername(
             @NotBlank(message = "Username is empty")
             @Length(max = 50, message = "Username exceeds 50 characters")
-            @UsernameValidator
+            @ValidUsername
             @RequestParam String username
     ) throws BadRequestException {
         this.userService.checkUsername(username);
