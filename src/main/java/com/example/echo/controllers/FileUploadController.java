@@ -1,6 +1,8 @@
 package com.example.echo.controllers;
 
+import com.example.echo.annotations.ValidFile;
 import com.example.echo.services.FileStorageService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,20 +16,24 @@ import java.io.IOException;
 @RequestMapping("/api/v1/file")
 public class FileUploadController {
 
-    private FileStorageService fileStorageService;
+    private final FileStorageService fileStorageService;
 
     @Autowired
     public FileUploadController(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
-    @PostMapping("/upload-file")
+    @PostMapping("")
     public Boolean uploadFile(
-            @RequestParam("files") MultipartFile[] files
+            @Valid
+            @ValidFile(
+                    allowedTypes = {"image/jpeg", "image/png", "application/pdf"},
+                    maxSize = 25 * 1024 * 1024,
+                    message = "Invalid file(s)"
+            )
+            @RequestParam("file") MultipartFile file
     ) throws IOException {
-        for(MultipartFile file : files) {
-            fileStorageService.saveFile(file);
-        }
+        this.fileStorageService.saveFile(file);
 
         return true;
     }
