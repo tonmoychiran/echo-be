@@ -149,8 +149,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Response> handleGeneralException(
             Exception ex
     ) {
-        System.out.println(ex.getClass());
-        System.out.println(ex.getMessage());
+        System.out.println(ex.toString());
         return new ResponseEntity<>(
                 new Response(ex.getMessage()),
                 HttpStatus.INTERNAL_SERVER_ERROR

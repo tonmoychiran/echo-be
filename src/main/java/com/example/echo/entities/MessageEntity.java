@@ -9,8 +9,8 @@ import java.util.List;
 @Table(name = "message")
 public class MessageEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String messageId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long messageId;
 
     @Column(columnDefinition = "TEXT")
     private String message;
@@ -19,7 +19,7 @@ public class MessageEntity {
     private Long createdAt;
 
     @OneToMany(mappedBy = "message")
-    private List<MessageMediaEntity> media;
+    private List<MessageAttachmentEntity> attachments;
 
     @ManyToOne
     @JoinColumn(name="user_id")
@@ -35,9 +35,9 @@ public class MessageEntity {
         this.conversation = conversation;
     }
 
-    public MessageEntity(String message, List<MessageMediaEntity> media, UserEntity user, ConversationEntity conversation) {
+    public MessageEntity(String message, List<MessageAttachmentEntity> attachments, UserEntity user, ConversationEntity conversation) {
         this.message = message;
-        this.media = media;
+        this.attachments = attachments;
         this.user = user;
         this.conversation = conversation;
     }
@@ -46,11 +46,11 @@ public class MessageEntity {
 
     }
 
-    public String getMessageId() {
+    public Long getMessageId() {
         return messageId;
     }
 
-    public void setMessageId(String messageId) {
+    public void setMessageId(Long messageId) {
         this.messageId = messageId;
     }
 
@@ -70,12 +70,12 @@ public class MessageEntity {
         this.createdAt = createdAt;
     }
 
-    public List<MessageMediaEntity> getMedia() {
-        return media;
+    public List<MessageAttachmentEntity> getAttachments() {
+        return attachments;
     }
 
-    public void setMedia(List<MessageMediaEntity> media) {
-        this.media = media;
+    public void setAttachments(List<MessageAttachmentEntity> attachments) {
+        this.attachments = attachments;
     }
 
     public UserEntity getUser() {

@@ -1,10 +1,12 @@
 package com.example.echo.requests;
 
+import com.example.echo.entities.AttachmentEntity;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.List;
+
 public class MessageRequest {
-    @NotBlank(message = "Conversation Id is empty")
-    String conversationId;
+    List<AttachmentEntity> attachments;
 
     @NotBlank(message = "Message is empty")
     String message;
@@ -13,7 +15,7 @@ public class MessageRequest {
         return message;
     }
 
-    public String getConversationId() {
-        return conversationId;
+    public List<AttachmentEntity> getAttachments() {
+        return attachments;
     }
 }
